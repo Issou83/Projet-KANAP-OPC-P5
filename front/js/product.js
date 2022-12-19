@@ -36,10 +36,18 @@ fetch("http://localhost:3000/api/products/" + idProduct)
     }
 
     //Stockage des éléments choisis dans la page 'product' pour futur utilisation dans la page du panier
+    //Variable des element à pointer
     const button = document.getElementById('addToCart')
-
+    const input = document.getElementById("quantity")
+    //fonction avec écoute des évenements du clique sur le bouton "Ajouter au panier", de l'input avec id "quantity" et du select "colors"
     button.addEventListener('click', function() {
-    localStorage["name"] = product.name
+    localStorage["id"] = product._id
+    localStorage["color"] = product.colors[1]
+    input.addEventListener('input', function() {
+        localStorage["number"] = input.value
+    }
+    
+    )
 
 })
   });
