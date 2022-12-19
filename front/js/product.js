@@ -35,6 +35,13 @@ fetch("http://localhost:3000/api/products/" + idProduct)
     document.getElementById("colors").innerHTML += (`<option value="${colors}">${colors}</option>`);
     }
 
+    //Stockage des éléments choisis dans la page 'product' pour futur utilisation dans la page du panier
+    const button = document.getElementById('addToCart')
+
+    button.addEventListener('click', function() {
+    localStorage["name"] = product.name
+
+})
   });
 
 
