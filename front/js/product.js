@@ -28,18 +28,32 @@ fetch("http://localhost:3000/api/products/" + idProduct)
 
 
     //Pour la couleur on utilise un boucle qui nous permettant d'extraire chaque couleur du tableau "colors"
-    for (let colors of product.colors) {
-        console.log(colors);
+    for (let color of product.colors) {
+        console.log(color);
 
     //Injection des éléments de couleur dans le DOM : dans notre id "
-    document.getElementById("colors").innerHTML += (`<option value="${colors}">${colors}</option>`);
-    }
+    // document.getElementById("colors").innerHTML += (`<option value="${colors}">${colors}</option>`);
+    // }
 
     //Stockage des éléments choisis dans la page 'product' pour futur utilisation dans la page du panier
     //Variables des elements à pointer
     const button = document.getElementById('addToCart')
 
-  });
+    button.addEventListener(`click`, function() {
+
+
+
+    let objJson = {
+        name: product.name,
+        color: colors.value,
+        price: product.price 
+    }
+    let objLinea = JSON.stringify(objJson);
+    localStorage.setItem("selectProduct", objLinea);
+
+    })
+  }})
+
 
 
 // Clear temporaire pour remise à Zero du tableau "localStorage"

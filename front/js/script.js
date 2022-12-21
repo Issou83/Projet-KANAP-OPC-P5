@@ -27,19 +27,19 @@ fetch("http://localhost:3000/api/products")
       newLink.appendChild(article);
 
       const img = document.createElement("img");
-      img.setAttribute(`src`, `${product.imageUrl}`);
-      img.setAttribute(`alt`, `${product.altTxt}`);
+      img.setAttribute(`src`, product.imageUrl);
+      img.setAttribute(`alt`, product.altTxt);
       article.appendChild(img);
 
       const name = document.createElement("h3");
-      name.setAttribute(`class`, `productName`);
+      name.classList.add(`productName`);
       article.appendChild(name);
       name.innerText = product.name;
 
       const description = document.createElement(`p`);
-      description.setAttribute(`class`, `produitDescription`);
+      description.classList.add(`produitDescription`);
       article.appendChild(description);
       description.innerText = product.description;
-      
+
     }
   });
