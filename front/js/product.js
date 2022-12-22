@@ -47,12 +47,16 @@ fetch("http://localhost:3000/api/products/" + idProduct)
     //Fonction qui nous permet au click du bouton, nous savegardons les infos choisis du produit selectionné
     document.getElementById("addToCart").addEventListener("click", function () {
 
+
+        let array = []
+        let arrayh = JSON.stringify(array);
         //Variable contenant les infos de l'article choisi
         let objJson = {
             id: idProduct,
             quantity: quantity.value,
             color: colors.value,
             };
+        let objJsonh = JSON.stringify(objJson);
 
         //--------------------------------NOS CONDITIONS D'AJOUT DU PANIER-----------------------------------
 
@@ -68,10 +72,12 @@ fetch("http://localhost:3000/api/products/" + idProduct)
         if (localStorage.length === 0) {
             console.log(localStorage.length);
             console.log("Le localStorage est vide");
-            localStorage["obj"] = ""
 
-            let objLinea = JSON.stringify(objJson);
-            localStorage.setItem("obj",objLinea)
+
+            array.push(objJson)
+
+            localStorage.setItem("array", arrayh)
+            localStorage.setItem("objet", objJsonh)
         }
 
         //S'il n'est pas vide, le parcour mon panier pour trouver l'element comportant
