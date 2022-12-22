@@ -46,16 +46,43 @@ fetch("http://localhost:3000/api/products/" + idProduct)
 
     //Fonction qui nous permet au click du bouton, nous savegardons les infos choisis du produit selectionné
     document.getElementById("addToCart").addEventListener("click", function () {
-      // localStorage.setItem("id", idProduct);
-      // localStorage.setItem("quantity", quantity.value);
-      // localStorage.setItem("color", colors.value);
-      let objJson = {
-        id: idProduct,
-        quantity: quantity.value,
-        color: colors.value,
-      };
-      let objLinea = JSON.stringify(objJson);
-      localStorage.setItem("obj", objLinea);
+
+        //Variable contenant les infos de l'article choisi
+        let objJson = {
+            id: idProduct,
+            quantity: quantity.value,
+            color: colors.value,
+            };
+
+//----------------------------------------NOS CONDITIONS D'AJOUT DU PANIER------------------------------------------
+
+
+        //Si le panier du localStorage est vide, j'ajoute mon article dans un tableau
+
+        //Recuperation du tableau dans le localStorage
+
+        //Envoi de L'objet produit dans le panier
+
+        // localStorage.setItem("obj", objIn);
+
+        if (localStorage.length === 0) {
+            console.log("Le localStorage est vide");
+        }
+
+        //S'il n'est pas vide, le parcour mon panier pour trouver l'element comportant
+        //l'Id et la couleur de mon article
+        else  {
+        //Envoi de L'objet produit dans le panier
+            console.log("Nous ajoutons un nouveau produit au localStorage");
+        }
+
+
+
+
+
+
+
+
     });
   });
 
