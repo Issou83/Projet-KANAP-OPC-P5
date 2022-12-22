@@ -54,10 +54,10 @@ fetch("http://localhost:3000/api/products/" + idProduct)
             color: colors.value,
             };
 
-//----------------------------------------NOS CONDITIONS D'AJOUT DU PANIER------------------------------------------
+        //--------------------------------NOS CONDITIONS D'AJOUT DU PANIER-----------------------------------
 
 
-        //Si le panier du localStorage est vide, j'ajoute mon article dans un tableau
+        //Si le panier du localStorage est vide, on ajoute l'article selectionné dans un tableau
 
         //Recuperation du tableau dans le localStorage
 
@@ -66,13 +66,19 @@ fetch("http://localhost:3000/api/products/" + idProduct)
         // localStorage.setItem("obj", objIn);
 
         if (localStorage.length === 0) {
+            console.log(localStorage.length);
             console.log("Le localStorage est vide");
+            localStorage["obj"] = ""
+
+            let objLinea = JSON.stringify(objJson);
+            localStorage.setItem("obj",objLinea)
         }
 
         //S'il n'est pas vide, le parcour mon panier pour trouver l'element comportant
         //l'Id et la couleur de mon article
         else  {
         //Envoi de L'objet produit dans le panier
+            console.log(localStorage.length);
             console.log("Nous ajoutons un nouveau produit au localStorage");
         }
 
