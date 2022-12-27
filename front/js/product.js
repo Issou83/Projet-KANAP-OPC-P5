@@ -19,16 +19,18 @@ fetch("http://localhost:3000/api/products/" + idProduct)
     console.log(product.imageUrl);
     console.log(product.colors);
     // On peut désormais introduir les éléments du produit dans leurs emplcements respectifs
-    // On vise l'emplacement souhaité pour y introduir la bonne valeur de product
+    // On vise l'emplacement souhaité pour y introduir la bonne valeur du produit choisi
 
-    document.querySelector(
-      ".item__img"
-    ).innerHTML = `<img src="${product.imageUrl}" alt="${product.altText}">`;
+    const imageContainer = document.querySelector("div.item__img");
+    const imageProduct = document.createElement("img");
+    imageContainer.appendChild(imageProduct);
+    imageProduct.setAttribute("src", product.imageUrl);
+
     document.getElementById("title").innerText = product.name;
     document.getElementById("description").innerText = product.description;
     document.getElementById("price").innerText = product.price;
 
-    //Pour la couleur on utilise un boucle qui nous permettant d'extraire chaque couleur du tableau "colors"
+    //Pour la couleur on utilise une boucle qui nous permet d'extraire chaque couleur du tableau "colors"
     for (let i = 0; i < product.colors.length; i++) {
       console.log(product.colors[i]);
 
@@ -36,77 +38,70 @@ fetch("http://localhost:3000/api/products/" + idProduct)
 
       const optionColors = document.getElementById("colors");
       let newsOptions = document.createElement("option");
-      newsOptions.setAttribute(`value`, product.colors[i]);
+      newsOptions.setAttribute("value", product.colors[i]);
 
       newsOptions.innerText = product.colors[i];
       optionColors.appendChild(newsOptions);
     }
-
-    //Stockage des éléments choisis dans la page 'product' pour futur utilisation dans la page du panier
-
-    //Fonction qui nous permet au click du bouton, nous savegardons les infos choisis du produit selectionné
-    document.getElementById("addToCart").addEventListener("click", function () {
-
-
-
-        //--------------------------------NOS CONDITIONS D'AJOUT DU PANIER-----------------------------------
-
-
-        //Si le panier du localStorage est vide, on ajoute l'article selectionné dans un tableau
-
-        //Recuperation du tableau dans le localStorage
-
-        //Envoi de L'objet produit dans le panier
-
-        // localStorage.setItem("obj", objIn);
-
-        if (localStorage.length === 0) {
-            console.log(localStorage.length);
-            console.log("Le localStorage est vide");
-
-        //Variable contenant un tableau vide à implémenter avec les articles que l'on choisira
-        let array = []
-
-        //Variable contenant les infos de l'article choisi
-        let objJson = {
-            id: idProduct,
-            quantity: quantity.value,
-            color: colors.value,
-            };
-
-        array.push(objJson)
-        let arrayh = JSON.stringify(array);
-
-
-        let objJsonh = JSON.stringify(objJson);
-
-
-            localStorage.setItem("array", arrayh)
-            arrayh.push(objJsonh)
-            console.log(localStorage.length);
-        }
-
-        //S'il n'est pas vide, le parcour mon panier pour trouver l'element comportant
-        //l'Id et la couleur de mon article
-        else  {
-        //Envoi de L'objet produit dans le panier
-
-
-
-            console.log(localStorage.length);
-            console.log("Nous ajoutons un nouveau produit au localStorage");
-
-        }
-
-
-
-
-
-
-
-
-    });
   });
 
-// Clear temporaire pour remise à Zero du tableau "localStorage"
-//   localStorage.clear();
+//---------------------Stockage des éléments choisis dans la page 'product' pour futur utilisation dans la page du panier-------------------
+
+document.getElementById("addToCart").addEventListener("click", function () {
+
+  // Je récupère mon panier dans le localstorage
+  let arryrecup = localStorage.getItem("arrayProd");
+  let array = JSON.parse(arryrecup);
+
+
+
+  // S'il est vide j'ajoute mon article dans un tableau
+  if (localStorage.length === 0) {
+    // je mets à jour le localstorage
+
+    //Variable du tableau qui contiendra nos produit selectionnés pour le localStorage (à destination du panier)
+    let array = [];
+
+    //Variable de l'objet choisi
+    let objProduct = {
+      id: idProduct,
+      quantity: quantity.value,
+      color: colors.value,
+    };
+
+    // On injecte notre 1er produit dans le tableau
+    array.push(objProduct);
+
+    //On envoi le tout dans le localStorage
+    let arrayh = JSON.stringify(array);
+    localStorage.setItem("arrayProd", arrayh);
+    console.log(array.length);
+    console.log("Nous ajoutons un 1er produit");
+  }
+
+  // S'il n'est pas vide, Je parcours mon panier pour trouver l'élement comportant l'id et la couleur de mon aricle
+  else  {
+
+    for (element of array) {
+      console.log(element.id);
+    }
+
+    //Variable de l'objet choisi
+    let objProduct = {
+      id: idProduct,
+      quantity: quantity.value,
+      color: colors.value,
+    };
+
+    array.push(objProduct);
+    console.log(array);
+
+    let arrayUp = JSON.stringify(array);
+    localStorage.setItem("arrayProd", arrayUp);
+    console.log(`Nous ajoutons un nouveau produit au localStorage, il y a maintenant ${array.length} produits`);
+
+  }
+
+
+
+});
