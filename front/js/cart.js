@@ -91,7 +91,7 @@ for (i = 0; i < arrayLS.length; i++) {
 
       //On commence par viser notre input contenant l'information que nous voulons écouter, choisie par son id/couleur que nous lui avons injecté dans le HTMLcollection (en ligne 80)
       const changeItemQ = document.getElementsByClassName("itemQuantity");
-      console.log(changeItemQ);
+
 
       //On fait une boucle qui nous permet de parcourir le(s) produit(s) du HTMLcollection et trouver toutes les infos qu'il(s) contiennent...id, couleur, quantité...
       for (let a = 0; a < changeItemQ.length; a++) {
@@ -103,14 +103,15 @@ for (i = 0; i < arrayLS.length; i++) {
 
         //nous n'avons plus qu' à les cibler et effectuer une condition appliquée sur leur valeur/"value" si leur valeur (modifiée) est conprise entre 0 et 100 alors...e.target fait donc reference à l'input"
         changeItemQuantity.onchange = (e) => {
+            console.log(e.target.id);
           if (e.target.value <= 100 && e.target.value > 0) {
             //...on trouve leur paire dans le localstorage(qui contient l'ancienne quantité)
-            const productNewQuantity = arrayLS.find(
+            const productCurrentQuantity = arrayLS.find(
               (o) => o.id + o.color === changeItemQuantity.id
             );
 
             //...et on leur ajoute la valeur que l'on cherchait à ecouter lors du déclanchement de l'evenement (onchange)
-            productNewQuantity.quantity =+ e.target.value;
+            productCurrentQuantity.quantity =+ e.target.value;
 
             //Nous pouvons tout renvoyer dans le local storage
             localStorage.setItem("arrayProd", JSON.stringify(arrayLS));
@@ -128,8 +129,29 @@ for (i = 0; i < arrayLS.length; i++) {
       divDelete.appendChild(deleteItem);
       deleteItem.className = "deleteItem";
       deleteItem.innerText = "Supprimer";
+      
+      //On vise notre élément "Supprimer" pour pouvoir l'écouter
+      const deleteButton =  document.getElementsByClassName("cart__item__content__settings__delete")
 
 
+      for (let a = 0; a < deleteButton.length; a++) {
+        console.log(deleteButton[a]);
+        const singleButton = deleteButton[a]
 
+        singleButton.onclick = (d) => {
+        console.log(d.target);
+        const D = singleButton.closest('article')
+            console.log(D.dataset.id);
+        const elefound = arrayLS.find((h) => h.id + h.color === D.dataset.id + D.dataset.color);
+          console.log(elefound)
+
+            const array = arrayLS.filter(ele => ele !=elefound)
+            
+            console.log(array);
+            let arrayh = JSON.stringify(array);
+            localStorage.setItem("arrayProd", arrayh);
+        }
+
+      }
     });
 }
