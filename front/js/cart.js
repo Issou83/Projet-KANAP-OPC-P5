@@ -2,18 +2,12 @@
 let arrayRecup = localStorage.getItem("arrayProd");
 let arrayLS = JSON.parse(arrayRecup);
 
-
-
 //nous parcourons notre tableau
 for (i = 0; i < arrayLS.length; i++) {
   //   var elArray = arrayLS[i];
   let idArray = arrayLS[i].id;
   let colorArray = arrayLS[i].color;
   let quantityArray = arrayLS[i].quantity;
-
-
-
-
 
   //Injectons maintenant nos produit et leurs infos
 
@@ -31,7 +25,6 @@ for (i = 0; i < arrayLS.length; i++) {
     .then((dataProduct) => dataProduct.json())
     //Récupèration des données
     .then((product) => {
-      console.log(product);
       //Création de la div de l'image et de la div du contenu de la carte
       const divImage = document.createElement("div");
       containerProduct.appendChild(divImage);
@@ -86,123 +79,88 @@ for (i = 0; i < arrayLS.length; i++) {
       inputNumber.setAttribute("min", 1);
       inputNumber.setAttribute("max", 100);
       inputNumber.setAttribute("value", quantityArray);
-
-      inputNumber.setAttribute("id", idArray + colorArray)
-      console.log(inputNumber.id);
-      /*On injecte à nos produits un id:id/couleur (renseigner par le tableau du localstorage) 
-      pour pouvoir ensuite agir sur le bon produit, lors d'une modif de la quantité*/
-
-
+      inputNumber.dataset.id = idArray;
+      inputNumber.dataset.color = colorArray;
 
       //------------Mise à jour de la quantité produit dans le "arrayLS"-----------------------------
 
-      /*On commence par viser notre input contenant l'information que nous voulons écouter, 
-      choisie par son id/couleur que nous lui avons injecté dans le HTMLcollection (en ligne 80)*/
-      const changeItemQ = document.getElementsByClassName("itemQuantity");
-
-      /*On fait une boucle qui nous permet de parcourir les produits du HTMLcollection
-      et trouver toutes les infos qu'il(s) contiennent...id, couleur, quantité...*/
-      for (let a = 0; a < changeItemQ.length; a++) {
-
-        //On les stock dans une variable
-        const changeItemQuantity = changeItemQ[a];
-
-        /*nous n'avons plus qu' à les cibler et effectuer une condition appliquée sur
+      /*On effectuer une condition appliquée sur
         leur valeur/"value" si leur valeur (modifiée) est conprise entre 0 et 100 alors...e.target fait donc reference à l'input"*/
-        changeItemQuantity.onchange = (e) => {
-          console.log(e.target);
-          if (e.target.value <= 100 && e.target.value > 0) {
-            //...On trouve leur paire dans le localstorage(qui contient l'ancienne quantité) qui la mème id et la méme couleur
-            const productCurrentQuantity = arrayLS.find((o) => o.id + o.color === changeItemQuantity.id);
+      inputNumber.onchange = () => {
+        console.log(arrayLS);
+        //Si une valeur par l'utilisateur es comprise entre 0 et 100
+        if (inputNumber.value <= 100 && inputNumber.value > 0) {
+          //...On trouve leur paire dans le localstorage(qui contient l'ancienne quantité) qui la mème id et la méme couleur
+          const productCurrentQuantity = arrayLS.find(
+            (o) =>
+              o.id === inputNumber.dataset.id &&
+              o.color === inputNumber.dataset.color
+          );
 
-            //...et on leur ajoute la valeur que l'on cherchait à ecouter lors du déclanchement de l'evenement (onchange)
-            productCurrentQuantity.quantity = +e.target.value;
-            console.log(e.target.value);
-            //Nous pouvons tout renvoyer dans le local storage
-            localStorage.setItem("arrayProd", JSON.stringify(arrayLS));
-            window.location.reload();
-          } else {
-            alert("Saississez une quantité de Kanap entre 1 et 100 éléments");
-          }
+          //...et on leur ajoute la valeur que l'on cherchait à ecouter lors du déclanchement de l'evenement (onchange)
+          productCurrentQuantity.quantity =+ inputNumber.value;
 
-        };
+          //Nous pouvons tout renvoyer dans le local storage
+          localStorage.setItem("arrayProd", JSON.stringify(arrayLS));
 
-      }
+          var Qtotal = 0;
+          arrayLS.forEach((element) => {
+            Qtotal += element.quantity;
+          });
+          document.getElementById("totalQuantity").innerHTML = Qtotal;
+        } else {
+          alert("Saississez une quantité de Kanap entre 1 et 100 éléments");
+        }
+      };
+      var Qtotal = 0;
+      arrayLS.forEach((element) => {
+        Qtotal += element.quantity;
+      });
+      document.getElementById("totalQuantity").innerHTML = Qtotal;
 
       let divDelete = document.createElement("div");
       divSettings.appendChild(divDelete);
       divDelete.className = `cart__item__content__settings__delete`;
+      divSettings.dataset.id = idArray;
+      divSettings.dataset.color = colorArray;
 
       let deleteItem = document.createElement("p");
       divDelete.appendChild(deleteItem);
       deleteItem.className = "deleteItem";
       deleteItem.innerText = "Supprimer";
 
-
-
       //-------------------------------------------Produit à supprimer----------------------------------
-      //On vise notre élément "Supprimer" pour pouvoir l'écouter
-      const deleteButton = document.getElementsByClassName(
-        "cart__item__content__settings__delete"
-      );
 
-      //On recherche chaque elements "supprmer" des produits presents (dans le HTMLcollection)
-      for (let a = 0; a < deleteButton.length; a++) {
-        console.log(deleteButton);
-        console.log(deleteButton[a]);
-        //On les stock dans une variable
-        const singleButton = deleteButton[a];
+      divDelete.onclick = () => {
+        //On cherche le bon produit présent dans notre tableau récuperer du local Storage
+        const productfound = arrayLS.find(
+          (h) =>
+            h.id === divSettings.dataset.id &&
+            h.color === divSettings.dataset.color
+        );
 
-        //On leur assigne un evenement au clic
-        singleButton.onclick = (d) => {
-          console.log(d.target);
+        //...et on filtre ce méme tableau pour en supprimer le produit sur lequel nous avous cliqué
+        const array = arrayLS.filter((productLS) => productLS != productfound);
 
-          /*On met dans une variable leurs ancetres respectifs "article",
-          ce qui nous permetent de les viser lors de la suppression. Ils renferment notemment les infos qui identifient nos produits*/
-          const parentOfDelete = singleButton.closest("article");
-          console.log(parentOfDelete.dataset.id);
+        //On renvoie le tableau modifié dans le localstorage
 
-          //Nous n'avons plus qu'à trouver trouver le bon produit présent dans notre tableau récuperer du local Storage  
-          const productfound = arrayLS.find((h) => h.id + h.color === parentOfDelete.dataset.id + parentOfDelete.dataset.color);
-          console.log(productfound);
-          
-          //...et à filtrer ce méme tableau pour en supprimer le produit sur lequel nous avous cliqué
-          const array = arrayLS.filter((productLS) => productLS != productfound);
-
-          //On renvoie le tableau modifié dans le localstorage 
-          console.log(array);
-          localStorage.setItem("arrayProd", JSON.stringify(array));
-          window.location.reload();
-        };
-      }
-
+        localStorage.setItem("arrayProd", JSON.stringify(array));
+        window.location.reload();
+      };
+      // }
     });
 
-// --------------------------------Total Qauntity------------------
+  // --------------------------------Total Qauntity------------------
 
-let tableauTotalQuantite = [];
-      console.log(tableauTotalQuantite);
+  let arrayTotalQuantite = [];
 
-      for (let i = 0; i < arrayLS.length; i++) {
-        let nombreArticle = arrayLS[i].quantity;
-        tableauTotalQuantite.push(nombreArticle);
-     }
-     console.log(tableauTotalQuantite);
-     // Additionner les quantités qu'il y'a dans le tableau de la variable "tableauQuantite" :
-     const reducer = (accumulator, currentValue) => accumulator + currentValue;
-     const quantiteTotal = tableauTotalQuantite.reduce(reducer, 0);
-     console.log(quantiteTotal);
+  arrayTotalQuantite.push(quantityArray);
 
-     totalQuantity.textContent = quantiteTotal
+  // Additionner les quantités qu'il y'a dans le tableau de la variable "tableauQuantite" :
+  const reducer = (accumulator, currentValue) => accumulator + currentValue;
+  const quantiteTotal = arrayTotalQuantite.reduce(reducer, 0);
 
-  
+  totalQuantity.textContent = quantiteTotal;
 
-
-
-  
-  
-//   -------------------------------Total Price-------------------
-
-
+  //   -------------------------------Total Price-------------------
 }
-
