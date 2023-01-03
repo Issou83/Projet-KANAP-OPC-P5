@@ -4,7 +4,7 @@ let arrayLS = JSON.parse(arrayRecup);
 
 //nous parcourons notre tableau
 for (i = 0; i < arrayLS.length; i++) {
-  //   var elArray = arrayLS[i];
+
   let idArray = arrayLS[i].id;
   let colorArray = arrayLS[i].color;
   let quantityArray = arrayLS[i].quantity;
@@ -16,8 +16,8 @@ for (i = 0; i < arrayLS.length; i++) {
   const containerProduct = document.createElement("article");
   sectionProduct.appendChild(containerProduct);
   containerProduct.className = `cart__item`;
-  containerProduct.setAttribute("data-id", idArray);
-  containerProduct.setAttribute("data-color", colorArray);
+  containerProduct.dataset.id = idArray;
+  containerProduct.dataset.color = colorArray;
 
   //Envoi d'une requête HTTP de type GET au service web
   fetch("http://localhost:3000/api/products/" + idArray)
@@ -25,6 +25,8 @@ for (i = 0; i < arrayLS.length; i++) {
     .then((dataProduct) => dataProduct.json())
     //Récupèration des données
     .then((product) => {
+
+
       //Création de la div de l'image et de la div du contenu de la carte
       const divImage = document.createElement("div");
       containerProduct.appendChild(divImage);
@@ -82,7 +84,7 @@ for (i = 0; i < arrayLS.length; i++) {
       inputNumber.dataset.id = idArray;
       inputNumber.dataset.color = colorArray;
 
-      //------------Mise à jour de la quantité produit dans le "arrayLS"-----------------------------
+      //----------------------------Foncion de la modification de la quantité produit-----------------------------
 
       /*On effectuer une condition appliquée sur
         leur valeur/"value" si leur valeur (modifiée) est conprise entre 0 et 100 alors...e.target fait donc reference à l'input"*/
@@ -100,24 +102,22 @@ for (i = 0; i < arrayLS.length; i++) {
           //...et on leur ajoute la valeur que l'on cherchait à ecouter lors du déclanchement de l'evenement (onchange)
           productCurrentQuantity.quantity =+ inputNumber.value;
 
-          //Nous pouvons tout renvoyer dans le local storage
+          //Nous pouvons tout renvoyer le tableau dans le localstorage
           localStorage.setItem("arrayProd", JSON.stringify(arrayLS));
 
           var Qtotal = 0;
           arrayLS.forEach((element) => {
             Qtotal += element.quantity;
+            console.log(Qtotal);
           });
           document.getElementById("totalQuantity").innerHTML = Qtotal;
+
         } else {
           alert("Saississez une quantité de Kanap entre 1 et 100 éléments");
         }
       };
-      var Qtotal = 0;
-      arrayLS.forEach((element) => {
-        Qtotal += element.quantity;
-      });
-      document.getElementById("totalQuantity").innerHTML = Qtotal;
 
+      //Création du "bouton" supprimer
       let divDelete = document.createElement("div");
       divSettings.appendChild(divDelete);
       divDelete.className = `cart__item__content__settings__delete`;
@@ -129,7 +129,7 @@ for (i = 0; i < arrayLS.length; i++) {
       deleteItem.className = "deleteItem";
       deleteItem.innerText = "Supprimer";
 
-      //-------------------------------------------Produit à supprimer----------------------------------
+      //------------------------------------fonction de roduit à supprimer----------------------------------
 
       divDelete.onclick = () => {
         //On cherche le bon produit présent dans notre tableau récuperer du local Storage
@@ -145,7 +145,10 @@ for (i = 0; i < arrayLS.length; i++) {
         //On renvoie le tableau modifié dans le localstorage
 
         localStorage.setItem("arrayProd", JSON.stringify(array));
-        window.location.reload();
+
+
+        // window.location.reload();
+        
       };
       // }
     });
