@@ -2,9 +2,11 @@
 let arrayRecup = localStorage.getItem("arrayProd");
 let arrayLS = JSON.parse(arrayRecup);
 
+// Initilisation du ableau pour le prix total des produit (inclut dans la bou)
+const arrayPriceTotal = [];
+
 //nous parcourons notre tableau
 for (i = 0; i < arrayLS.length; i++) {
-
   let idArray = arrayLS[i].id;
   let colorArray = arrayLS[i].color;
   let quantityArray = arrayLS[i].quantity;
@@ -25,8 +27,6 @@ for (i = 0; i < arrayLS.length; i++) {
     .then((dataProduct) => dataProduct.json())
     //Récupèration des données
     .then((product) => {
-
-
       //Création de la div de l'image et de la div du contenu de la carte
       const divImage = document.createElement("div");
       containerProduct.appendChild(divImage);
@@ -100,7 +100,7 @@ for (i = 0; i < arrayLS.length; i++) {
           );
 
           //...et on leur ajoute la valeur que l'on cherchait à ecouter lors du déclanchement de l'evenement (onchange)
-          productCurrentQuantity.quantity =+ inputNumber.value;
+          productCurrentQuantity.quantity = +inputNumber.value;
 
           //Nous pouvons tout renvoyer le tableau dans le localstorage
           localStorage.setItem("arrayProd", JSON.stringify(arrayLS));
@@ -111,11 +111,20 @@ for (i = 0; i < arrayLS.length; i++) {
             console.log(Qtotal);
           });
           document.getElementById("totalQuantity").innerHTML = Qtotal;
-
         } else {
           alert("Saississez une quantité de Kanap entre 1 et 100 éléments");
         }
+        
       };
+      //Nous pouvons tout renvoyer le tableau dans le localstorage
+      localStorage.setItem("arrayProd", JSON.stringify(arrayLS));
+
+      var Qtotal = 0;
+      arrayLS.forEach((element) => {
+        Qtotal += element.quantity;
+        console.log(Qtotal);
+      });
+      document.getElementById("totalQuantity").innerHTML = Qtotal;
 
       //Création du "bouton" supprimer
       let divDelete = document.createElement("div");
@@ -146,11 +155,11 @@ for (i = 0; i < arrayLS.length; i++) {
 
         localStorage.setItem("arrayProd", JSON.stringify(array));
 
+        //Suppression dans le DOM
+        sectionProduct.removeChild(containerProduct)
 
-        // window.location.reload();
-        
       };
-      // }
+
     });
 
   // --------------------------------Total Qauntity------------------
@@ -166,4 +175,17 @@ for (i = 0; i < arrayLS.length; i++) {
   totalQuantity.textContent = quantiteTotal;
 
   //   -------------------------------Total Price-------------------
+  // const TTPriceAndQ = quantityArray * product.price
+  // arrayPriceTotal.push(TTPriceAndQ)
+  // const reducery = (accumulator, currentValue) => accumulator + currentValue;
+  // const PriceTotal = arrayPriceTotal.reduce(reducery, 0);
+  // console.log(PriceTotal);
+  // totalPrice.textContent = PriceTotal
+  // const TTPriceAndQ = quantityArray * product.price
+  // arrayPriceTotal.push(TTPriceAndQ)
+  // const reducery = (accumulator, currentValue) => accumulator + currentValue;
+  // const PriceTotal = arrayPriceTotal.reduce(reducery, 0);
+  // console.log(PriceTotal);
+  // totalPrice.textContent = PriceTotal
 }
+//-------------------------------
