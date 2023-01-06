@@ -6,13 +6,10 @@ var idProduct = url.searchParams.get("id");
 
 //Envoi d'une requête HTTP de type GET au service web
 fetch("http://localhost:3000/api/products/" + idProduct)
-  //Récupération des données du "product" au format json
   .then((dataProduct) => dataProduct.json())
-
-  //Récupèration des données
   .then((product) => {
-    // On peut désormais introduir les éléments du produit dans leurs emplcements respectifs
-    // On vise l'emplacement souhaité pour y introduir la bonne valeur du produit choisi
+
+    // On peut désormais introduir les éléments du produit dans leurs emplcements respectifs du DOM
 
     const imageContainer = document.querySelector("div.item__img");
     const imageProduct = document.createElement("img");
