@@ -2,7 +2,6 @@
 let arrayRecup = localStorage.getItem("arrayProd");
 let arrayLS = JSON.parse(arrayRecup);
 
-
 const arrayPrices = [];
 
 //nous parcourons notre tableau
@@ -11,14 +10,12 @@ for (i = 0; i < arrayLS.length; i++) {
   let colorArray = arrayLS[i].color;
   let quantityArray = arrayLS[i].quantity;
 
-
   //-----------------------Création des elements dans le DOM------------------------
 
   //Envoi d'une requête HTTP de type GET au service web
   fetch("http://localhost:3000/api/products/" + idArray)
-    //Récupération des données du "product" au format json
     .then((dataProduct) => dataProduct.json())
-    //Récupèration des données
+
     .then((product) => {
       //Création du container de produit
       const sectionProduct = document.getElementById("cart__items");
@@ -93,7 +90,7 @@ for (i = 0; i < arrayLS.length; i++) {
       deleteItem.className = "deleteItem";
       deleteItem.innerText = "Supprimer";
 
-      //------------------------------Calcules des totaux de la quantité et prix des produits------------------------
+      //------------------Variable contenant les totaux de la quantité et prix des produits------------------------
       calculBasket = () => {
         CalculTotalQuantity = () => {
           let Qtotal = 0;
@@ -164,113 +161,130 @@ for (i = 0; i < arrayLS.length; i++) {
 
 //-------------------------------Validation du formulaire------------------------------
 
-//**Récupération des id depuis le DOM :**//
-
-const buttunOrder = document.querySelector("#order");
-buttunOrder.onclick = () => {
-
+//Variable pour pointage de Input et récuperation de leur valeur
+const regexFirstName = /^([A-Za-z]{2})?([-]{0,1})?([A-Za-z]{2,20})$/;
+const regexLastName = /^([A-Za-z]{2})?([-]{0,1})?([A-Za-z]{2,20})$/;
+const regexAddress = /^[a-zA-Z0-9\s,'-âä]{10,50}$/;
+const regexCity = /^([A-Za-z]{2})?([-]{0,1})?([A-Za-z]{2,20})$/;
+const regexEmail =
+  /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))/;
 
 const inputFirstName = document.querySelector("#firstName");
-let firstName = inputFirstName.value;
-const firstNameErrorMsg = document.querySelector("#firstNameErrorMsg");
-
-const inputLastName = document.querySelector("#lastName");
-let lastName = inputLastName.value;
-const lastNameErrorMsg = document.querySelector("#lastNameErrorMsg");
-
-
-const inputAddress = document.querySelector("#address");
-let address = inputAddress.value;
-const addressErrorMsg = document.querySelector("#addressErrorMsg");
-
-
-const inputCity = document.querySelector("#city");
-let city = inputCity.value;
-const cityErrorMsg = document.querySelector("#cityErrorMsg");
-
-
-const inputEmail = document.querySelector("#email");
-let email = inputEmail.value;
-const emailErrorMsg = document.querySelector("#emailErrorMsg");
-
-
-
-
-// RegEx pour verifier le prénom, le nom, la ville :
-const regexFirstName = /^([A-Za-z]{2,20})?([-]{0,1})?([A-Za-z]{2,20})$/;
-const regexLastName = /^([A-Za-z]{2,20})?([-]{0,1})?([A-Za-z]{2,20})$/;
-const regexCity = /^([A-Za-z]{2,20})?([-]{0,1})?([A-Za-z]{2,20})$/;
-const regexAddress = /^[a-zA-Z0-9\s,'-âä]{2,50}$/;
-const regexEmail = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))/;
-
-
-
+inputFirstName.onchange = () => {
+  let firstName = inputFirstName.value;
+  const firstNameErrorMsg = document.querySelector("#firstNameErrorMsg");
 
   if (regexFirstName.test(firstName) === true) {
     firstNameErrorMsg.textContent = "";
+    inputFirstName.style.border = "4px solid green";
   } else {
     firstNameErrorMsg.textContent = "Veuillez entrer un prénon valide!";
+    inputFirstName.style.border = "1px solid red";
   }
+  console.log(inputFirstName);
+};
+//--------------------------------------------------------------------------------
+const inputLastName = document.querySelector("#lastName");
+inputLastName.onchange = () => {
+  let lastName = inputLastName.value;
+  const lastNameErrorMsg = document.querySelector("#lastNameErrorMsg");
 
   if (regexLastName.test(lastName) === true) {
     lastNameErrorMsg.textContent = "";
+    inputLastName.style.border = "4px solid green";
   } else {
-    lastNameErrorMsg.textContent = "Veuillez entrer un nom valide!";
+    lastNameErrorMsg.textContent = "Veuillez entrer un prénon valide!";
+    inputLastName.style.border = "1px solid red";
   }
+  console.log(inputLastName);
+};
+
+//--------------------------------------------------------------------------------
+const inputAddress = document.querySelector("#address");
+inputAddress.onchange = () => {
+  let address = inputAddress.value;
+  const addressErrorMsg = document.querySelector("#addressErrorMsg");
 
   if (regexAddress.test(address) === true) {
     addressErrorMsg.textContent = "";
+    inputAddress.style.border = "4px solid green";
   } else {
-    addressErrorMsg.textContent = "Veuillez entrer une adresse valide!";
+    addressErrorMsg.textContent = "Veuillez entrer un prénon valide!";
+    inputAddress.style.border = "1px solid red";
   }
+  console.log(inputAddress);
+};
+//--------------------------------------------------------------------------------
+
+const inputCity = document.querySelector("#city");
+inputCity.onchange = () => {
+  let city = inputCity.value;
+  const cityErrorMsg = document.querySelector("#cityErrorMsg");
 
   if (regexCity.test(city) === true) {
     cityErrorMsg.textContent = "";
+    inputCity.style.border = "4px solid green";
   } else {
-    cityErrorMsg.textContent = "Veuillez entrer une ville valide!";
+    cityErrorMsg.textContent = "Veuillez entrer un prénon valide!";
+    inputCity.style.border = "1px solid red";
   }
+  console.log(inputCity);
+};
+//--------------------------------------------------------------------------------
+
+const inputEmail = document.querySelector("#email");
+inputEmail.onchange = () => {
+  let email = inputEmail.value;
+  const emailErrorMsg = document.querySelector("#emailErrorMsg");
 
   if (regexEmail.test(email) === true) {
     emailErrorMsg.textContent = "";
+    inputEmail.style.border = "4px solid green";
   } else {
-    emailErrorMsg.textContent = "Veuillez entrer un email valide!";
+    emailErrorMsg.textContent = "Veuillez entrer un prénon valide!";
+    inputEmail.style.border = "1px solid red";
   }
+  console.log(inputEmail);
+};
 
-
-
-
+const buttunOrder = document.querySelector("#order");
+buttunOrder.onclick = () => {
+  let firstName = inputFirstName.value;
+  let lastName = inputLastName.value;
+  let address = inputAddress.value;
+  let city = inputCity.value;
+  let email = inputEmail.value;
   console.log(inputFirstName.value);
   console.log(inputLastName.value);
   console.log(inputAddress.value);
   console.log(inputCity.value);
   console.log(inputEmail.value);
 
-console.log(regexFirstName.test(firstName));
-console.log(regexLastName.test(lastName));
-console.log(regexCity.test(city));
-console.log(regexAddress.test(address));
-console.log(regexEmail.test(email));
+  console.log(regexFirstName.test(firstName));
+  console.log(regexLastName.test(lastName));
+  console.log(regexCity.test(city));
+  console.log(regexAddress.test(address));
+  console.log(regexEmail.test(email));
 
+  if (
+    regexFirstName.test(firstName) === true &&
+    regexLastName.test(lastName) === true &&
+    regexCity.test(city) === true &&
+    regexAddress.test(address) === true &&
+    regexEmail.test(email) === true
+  ) {
+    let contact = {
+      firstName: inputFirstName.value,
+      lastName: inputLastName.value,
+      address: inputAddress.value,
+      city: inputCity.value,
+      email: inputEmail.value,
+    };
 
-
-if (
-  regexFirstName.test(firstName) === true &&
-  regexLastName.test(lastName) === true &&
-  regexCity.test(city) === true &&
-  regexAddress.test(address) === true &&
-  regexEmail.test(email) === true
-) {
-  let contact = {
-    firstName: inputFirstName.value,
-    lastName: inputLastName.value,
-    address: inputAddress.value,
-    city: inputCity.value,
-    email: inputEmail.value,
-  };
-
-  let form = JSON.stringify(contact);
-  localStorage.setItem("FormContac", form);
-  console.log(contact);
-
-} else {alert("Vérifiez votre saisie")}
-}
+    let form = JSON.stringify(contact);
+    localStorage.setItem("FormContac", form);
+    console.log(contact);
+  } else {
+    alert("Vérifiez votre saisie");
+  }
+};
