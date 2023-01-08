@@ -1,7 +1,10 @@
 //Recuperation produits du le localStorage
 let arrayRecup = localStorage.getItem("arrayProd");
 let arrayLS = JSON.parse(arrayRecup);
-let arrayPrices = [];
+
+
+const arrayPrices = [];
+
 //nous parcourons notre tableau
 for (i = 0; i < arrayLS.length; i++) {
   let idArray = arrayLS[i].id;
@@ -9,7 +12,7 @@ for (i = 0; i < arrayLS.length; i++) {
   let quantityArray = arrayLS[i].quantity;
 
 
-  //-----------------------Injectons maintenant nos produit et leurs infos------------------------
+  //-----------------------Création des elements dans le DOM------------------------
 
   //Envoi d'une requête HTTP de type GET au service web
   fetch("http://localhost:3000/api/products/" + idArray)
@@ -53,7 +56,7 @@ for (i = 0; i < arrayLS.length; i++) {
       divDescription.appendChild(productColor);
       productColor.innerText = colorArray;
 
-      const productPrice = document.createElement("p");
+      let productPrice = document.createElement("p");
       divDescription.appendChild(productPrice);
       productPrice.innerText = product.price + " €";
 
@@ -91,97 +94,183 @@ for (i = 0; i < arrayLS.length; i++) {
       deleteItem.innerText = "Supprimer";
 
       //------------------------------Calcules des totaux de la quantité et prix des produits------------------------
+      calculBasket = () => {
+        CalculTotalQuantity = () => {
+          let Qtotal = 0;
+          arrayLS.forEach((element) => {
+            Qtotal += element.quantity;
+            document.getElementById("totalQuantity").innerHTML = Qtotal;
 
-      CalculTotalQuantity = () => {
-        var Qtotal = 0;
-        arrayLS.forEach((element) => {
-          Qtotal += element.quantity;
-          document.getElementById("totalQuantity").innerHTML = Qtotal;
-        });
+            CalculTotalPrice = () => {
+              let PriceTotal = 0;
+              let priceTotalPerProduct = product.price * inputNumber.value;
+              console.log(inputNumber.value);
+              console.log(product.price);
+              console.log(priceTotalPerProduct);
+
+              arrayPrices.push(priceTotalPerProduct);
+
+              arrayPrices.forEach((elementPrice) => {
+                PriceTotal += elementPrice;
+              });
+              console.log(arrayPrices);
+              document.getElementById("totalPrice").innerHTML = PriceTotal;
+            };
+          });
+        };
+        CalculTotalQuantity();
+        CalculTotalPrice();
       };
 
-      CalcuculTotalPrice = () => {
-        
-        var PriceTotal = 0;
-        const priceTotalPerProduct = product.price * quantityArray;
-
-        arrayPrices.push(priceTotalPerProduct);
-        console.log(arrayPrices);
-
-        arrayPrices.forEach((elementPrice) => {
-          PriceTotal += elementPrice
-          document.getElementById("totalPrice").innerHTML = PriceTotal;
-          console.log();
-        })
-        
-      };
-
-      //Stockage du parent produit contenant les informations (id et couleur) du produit
+      calculBasket();
+      //----------------------------Foncion de la modification de la quantité produit------------------------
+      //Parent produit contenant les informations (id et couleur) du produit
       const productDelete = divDelete.closest(":not(div)");
 
-      //----------------------------Foncion de la modification de la quantité produit------------------------
-
-      /*On effectuer une condition appliquée sur
-      leur valeur/"value" si leur valeur (modifiée) est conprise entre 0 et 100 alors...*/
       inputNumber.onchange = () => {
-        console.log(arrayLS);
-        //Si une valeur rentrée par l'utilisateur est comprise entre 0 et 100
         if (inputNumber.value <= 100 && inputNumber.value > 0) {
-          /*...On trouve le produit dans le localstorage qui la mème id et la méme couleur 
-          que le produit contenant l'input que l'on à modifié*/
           const productCurrentQuantity = arrayLS.find(
             (o) =>
               o.id === productDelete.dataset.id &&
               o.color === productDelete.dataset.color
           );
-
-          /*...et on lui ajoute la valeur que 
-          l'on cherchait à ecouter lors du déclanchement de l'evenement (onchange)*/
           productCurrentQuantity.quantity = +inputNumber.value;
-
-          //Nous pouvons tout renvoyer le tableau dans le localstorage
+          calculBasket();
           localStorage.setItem("arrayProd", JSON.stringify(arrayLS));
+          window.location.reload();
         } else {
           alert("Saississez une quantité de Kanap entre 1 et 100 éléments");
         }
-        //Mise à jour de la quantité total et du prix total
-        CalculTotalQuantity();
-        
-        CalcuculTotalPrice();
       };
 
-      //------------------------------------fonction de roduit à supprimer----------------------------------
-
+      //------------------------------------fonction de produit à supprimer----------------------------------
       divDelete.onclick = () => {
-        //On cherche le bon produit présent dans notre tableau récuperer du local Storage
-
-        console.log(arrayLS);
         const productfound = arrayLS.find(
           (h) =>
             h.id === productDelete.dataset.id &&
             h.color === productDelete.dataset.color
         );
-        console.log(productfound);
-        //...et on filtre ce méme tableau pour en supprimer le produit sur lequel nous avous cliqué
         const array = arrayLS.filter((productLS) => productLS != productfound);
-        console.log(arrayLS);
-        //On renvoie le tableau modifié dans le localstorage
+        calculBasket();
+
         localStorage.setItem("arrayProd", JSON.stringify(array));
 
         //Suppression dans le DOM
-
         productDelete.remove();
-        console.log(productDelete);
-        // window.location.reload();
-
-        //Mise à jour de la quantité total et du prix total
-        CalculTotalQuantity();
-        CalcuculTotalPrice();
         window.location.reload();
       };
-
-      CalculTotalQuantity();
-      CalcuculTotalPrice();
     });
 }
+
 //-------------------------------Validation du formulaire------------------------------
+
+//**Récupération des id depuis le DOM :**//
+
+const buttunOrder = document.querySelector("#order");
+buttunOrder.onclick = () => {
+
+
+const inputFirstName = document.querySelector("#firstName");
+let firstName = inputFirstName.value;
+const firstNameErrorMsg = document.querySelector("#firstNameErrorMsg");
+
+const inputLastName = document.querySelector("#lastName");
+let lastName = inputLastName.value;
+const lastNameErrorMsg = document.querySelector("#lastNameErrorMsg");
+
+
+const inputAddress = document.querySelector("#address");
+let address = inputAddress.value;
+const addressErrorMsg = document.querySelector("#addressErrorMsg");
+
+
+const inputCity = document.querySelector("#city");
+let city = inputCity.value;
+const cityErrorMsg = document.querySelector("#cityErrorMsg");
+
+
+const inputEmail = document.querySelector("#email");
+let email = inputEmail.value;
+const emailErrorMsg = document.querySelector("#emailErrorMsg");
+
+
+
+
+// RegEx pour verifier le prénom, le nom, la ville :
+const regexFirstName = /^([A-Za-z]{2,20})?([-]{0,1})?([A-Za-z]{2,20})$/;
+const regexLastName = /^([A-Za-z]{2,20})?([-]{0,1})?([A-Za-z]{2,20})$/;
+const regexCity = /^([A-Za-z]{2,20})?([-]{0,1})?([A-Za-z]{2,20})$/;
+const regexAddress = /^[a-zA-Z0-9\s,'-âä]{2,50}$/;
+const regexEmail = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))/;
+
+
+
+
+  if (regexFirstName.test(firstName) === true) {
+    firstNameErrorMsg.textContent = "";
+  } else {
+    firstNameErrorMsg.textContent = "Veuillez entrer un prénon valide!";
+  }
+
+  if (regexLastName.test(lastName) === true) {
+    lastNameErrorMsg.textContent = "";
+  } else {
+    lastNameErrorMsg.textContent = "Veuillez entrer un nom valide!";
+  }
+
+  if (regexAddress.test(address) === true) {
+    addressErrorMsg.textContent = "";
+  } else {
+    addressErrorMsg.textContent = "Veuillez entrer une adresse valide!";
+  }
+
+  if (regexCity.test(city) === true) {
+    cityErrorMsg.textContent = "";
+  } else {
+    cityErrorMsg.textContent = "Veuillez entrer une ville valide!";
+  }
+
+  if (regexEmail.test(email) === true) {
+    emailErrorMsg.textContent = "";
+  } else {
+    emailErrorMsg.textContent = "Veuillez entrer un email valide!";
+  }
+
+
+
+
+  console.log(inputFirstName.value);
+  console.log(inputLastName.value);
+  console.log(inputAddress.value);
+  console.log(inputCity.value);
+  console.log(inputEmail.value);
+
+console.log(regexFirstName.test(firstName));
+console.log(regexLastName.test(lastName));
+console.log(regexCity.test(city));
+console.log(regexAddress.test(address));
+console.log(regexEmail.test(email));
+
+
+
+if (
+  regexFirstName.test(firstName) === true &&
+  regexLastName.test(lastName) === true &&
+  regexCity.test(city) === true &&
+  regexAddress.test(address) === true &&
+  regexEmail.test(email) === true
+) {
+  let contact = {
+    firstName: inputFirstName.value,
+    lastName: inputLastName.value,
+    address: inputAddress.value,
+    city: inputCity.value,
+    email: inputEmail.value,
+  };
+
+  let form = JSON.stringify(contact);
+  localStorage.setItem("FormContac", form);
+  console.log(contact);
+
+} else {alert("Vérifiez votre saisie")}
+}
