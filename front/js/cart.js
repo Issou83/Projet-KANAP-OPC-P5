@@ -1,8 +1,47 @@
+/*Fonction permettant le rafraichissement uniquement du prix total et de la quantité total
+Cette fonction est appelé pour la création innitial du DOM puis lors dune modification de quantité produit et lors d'un suppression*/
+
+calculBasket = () => {
+  document.getElementById("totalPrice").innerHTML = "";
+  let arrayPrices = [];
+
+  let Qtotal = 0;
+  getArrayLocalstorage = () => {
+    let arrayRecup = localStorage.getItem("arrayProd");
+    let arrayLS = JSON.parse(arrayRecup);
+    return arrayLS;
+  };
+  const dataStorage = getArrayLocalstorage();
+  console.log(dataStorage);
+  for (i = 0; i < dataStorage.length; i++) {
+    let idArray = dataStorage[i].id;
+    let productQuantity = dataStorage[i].quantity;
+
+    fetch("http://localhost:3000/api/products/" + idArray)
+      .then((dataProduct) => dataProduct.json())
+
+      .then((productsAPI) => {
+        let totalPricePerProduct = productsAPI.price * productQuantity;
+        let totalPrice = 0;
+
+        Qtotal += productQuantity;
+        document.getElementById("totalQuantity").innerHTML = Qtotal;
+
+        arrayPrices.push(totalPricePerProduct);
+
+        arrayPrices.forEach((elementPrice) => {
+          totalPrice += elementPrice;
+          console.log(elementPrice);
+          document.getElementById("totalPrice").innerHTML = totalPrice;
+          console.log(totalPrice);
+        });
+      });
+  }
+};
+
 //Recuperation produits du le localStorage
 let arrayRecup = localStorage.getItem("arrayProd");
 let arrayLS = JSON.parse(arrayRecup);
-
-const arrayPrices = [];
 
 //nous parcourons notre tableau
 for (i = 0; i < arrayLS.length; i++) {
@@ -90,78 +129,50 @@ for (i = 0; i < arrayLS.length; i++) {
       deleteItem.className = "deleteItem";
       deleteItem.innerText = "Supprimer";
 
-      //------------------Variable contenant les totaux de la quantité et prix des produits------------------------
-      calculBasket = () => {
-        CalculTotalQuantity = () => {
-          let Qtotal = 0;
-          arrayLS.forEach((element) => {
-            Qtotal += element.quantity;
-            document.getElementById("totalQuantity").innerHTML = Qtotal;
-
-            CalculTotalPrice = () => {
-              let PriceTotal = 0;
-              let priceTotalPerProduct = product.price * inputNumber.value;
-              console.log(inputNumber.value);
-              console.log(product.price);
-              console.log(priceTotalPerProduct);
-
-              arrayPrices.push(priceTotalPerProduct);
-
-              arrayPrices.forEach((elementPrice) => {
-                PriceTotal += elementPrice;
-              });
-              console.log(arrayPrices);
-              document.getElementById("totalPrice").innerHTML = PriceTotal;
-            };
-          });
-        };
-        CalculTotalQuantity();
-        CalculTotalPrice();
-      };
 
       calculBasket();
       //----------------------------Foncion de la modification de la quantité produit------------------------
+
       //Parent produit contenant les informations (id et couleur) du produit
-      const productDelete = divDelete.closest(":not(div)");
+      const baliseArticle = divDelete.closest(":not(div)");
 
       inputNumber.onchange = () => {
         if (inputNumber.value <= 100 && inputNumber.value > 0) {
           const productCurrentQuantity = arrayLS.find(
             (o) =>
-              o.id === productDelete.dataset.id &&
-              o.color === productDelete.dataset.color
+              o.id === baliseArticle.dataset.id &&
+              o.color === baliseArticle.dataset.color
           );
           productCurrentQuantity.quantity = +inputNumber.value;
-          calculBasket();
+
           localStorage.setItem("arrayProd", JSON.stringify(arrayLS));
-          window.location.reload();
         } else {
           alert("Saississez une quantité de Kanap entre 1 et 100 éléments");
         }
+        calculBasket();
       };
 
-      //------------------------------------fonction de produit à supprimer----------------------------------
+      //------------------------------------Fonction de produit à supprimer----------------------------------
       divDelete.onclick = () => {
         const productfound = arrayLS.find(
           (h) =>
-            h.id === productDelete.dataset.id &&
-            h.color === productDelete.dataset.color
+            h.id === baliseArticle.dataset.id &&
+            h.color === baliseArticle.dataset.color
         );
         const array = arrayLS.filter((productLS) => productLS != productfound);
-        calculBasket();
 
         localStorage.setItem("arrayProd", JSON.stringify(array));
-
+        calculBasket();
         //Suppression dans le DOM
-        productDelete.remove();
-        window.location.reload();
+        baliseArticle.remove();
       };
     });
 }
 
 //-------------------------------Validation du formulaire------------------------------
 
-//Variable pour pointage de Input et récuperation de leur valeur
+//Variables contenants de regex
+//Manque lettres accentuées**********************************************
 const regexFirstName = /^([A-Za-z]{2})?([-]{0,1})?([A-Za-z]{2,20})$/;
 const regexLastName = /^([A-Za-z]{2})?([-]{0,1})?([A-Za-z]{2,20})$/;
 const regexAddress = /^[a-zA-Z0-9\s,'-âä]{10,50}$/;
@@ -169,6 +180,7 @@ const regexCity = /^([A-Za-z]{2})?([-]{0,1})?([A-Za-z]{2,20})$/;
 const regexEmail =
   /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))/;
 
+//Création de contions sur onchange de chaques input du formulaire de contact
 const inputFirstName = document.querySelector("#firstName");
 inputFirstName.onchange = () => {
   let firstName = inputFirstName.value;
@@ -178,12 +190,12 @@ inputFirstName.onchange = () => {
     firstNameErrorMsg.textContent = "";
     inputFirstName.style.border = "4px solid green";
   } else {
-    firstNameErrorMsg.textContent = "Veuillez entrer un prénon valide!";
+    firstNameErrorMsg.textContent = "Veuillez entrer un prénon valide svp!";
     inputFirstName.style.border = "1px solid red";
   }
-  console.log(inputFirstName);
+  
 };
-//--------------------------------------------------------------------------------
+//------------------------------
 const inputLastName = document.querySelector("#lastName");
 inputLastName.onchange = () => {
   let lastName = inputLastName.value;
@@ -193,13 +205,13 @@ inputLastName.onchange = () => {
     lastNameErrorMsg.textContent = "";
     inputLastName.style.border = "4px solid green";
   } else {
-    lastNameErrorMsg.textContent = "Veuillez entrer un prénon valide!";
+    lastNameErrorMsg.textContent = "Veuillez entrer un prénon valide svp!";
     inputLastName.style.border = "1px solid red";
   }
-  console.log(inputLastName);
+  
 };
 
-//--------------------------------------------------------------------------------
+//------------------------------
 const inputAddress = document.querySelector("#address");
 inputAddress.onchange = () => {
   let address = inputAddress.value;
@@ -209,12 +221,12 @@ inputAddress.onchange = () => {
     addressErrorMsg.textContent = "";
     inputAddress.style.border = "4px solid green";
   } else {
-    addressErrorMsg.textContent = "Veuillez entrer un prénon valide!";
+    addressErrorMsg.textContent = "Veuillez entrer un prénon valide svp!";
     inputAddress.style.border = "1px solid red";
   }
-  console.log(inputAddress);
+  
 };
-//--------------------------------------------------------------------------------
+//-------------------------------
 
 const inputCity = document.querySelector("#city");
 inputCity.onchange = () => {
@@ -225,12 +237,12 @@ inputCity.onchange = () => {
     cityErrorMsg.textContent = "";
     inputCity.style.border = "4px solid green";
   } else {
-    cityErrorMsg.textContent = "Veuillez entrer un prénon valide!";
+    cityErrorMsg.textContent = "Veuillez entrer un prénon valide svp!";
     inputCity.style.border = "1px solid red";
   }
-  console.log(inputCity);
+  
 };
-//--------------------------------------------------------------------------------
+//--------------------------------
 
 const inputEmail = document.querySelector("#email");
 inputEmail.onchange = () => {
@@ -241,10 +253,10 @@ inputEmail.onchange = () => {
     emailErrorMsg.textContent = "";
     inputEmail.style.border = "4px solid green";
   } else {
-    emailErrorMsg.textContent = "Veuillez entrer un prénon valide!";
+    emailErrorMsg.textContent = "Veuillez entrer un prénon valide svp!";
     inputEmail.style.border = "1px solid red";
   }
-  console.log(inputEmail);
+  
 };
 
 const buttunOrder = document.querySelector("#order");
