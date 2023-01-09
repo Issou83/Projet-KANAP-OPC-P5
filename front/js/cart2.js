@@ -1,37 +1,28 @@
-//Recuperation produits du le localStorage
+//Recuperation du tableau de produit dans le localStorage
 getArrayLocalstorage = () => {
   let arrayRecup = localStorage.getItem("arrayProd");
   let arrayLS = JSON.parse(arrayRecup);
   return arrayLS;
 };
-const dataStorage = getArrayLocalstorage();
-const arrayPrices = [];
-let PriceTotal = 0;
-let Qtotal = 0;
-for (i = 0; i < dataStorage.length; i++) {
-  let productID = dataStorage[i].id;
-  let productQuantity = dataStorage[i].quantity;
-  let productColor = dataStorage[i].color;
 
-  fetch("http://localhost:3000/api/products/" + productID)
-    .then((dataProduct) => dataProduct.json())
+//Calcul de la quantité toltal panier
+calculQuantity = () => {
+  let totalQuantityBasket = 0;
+  totalQuantityBasket += productQuantity;
 
-    .then((productsAPI) => {
-      let totalPricePerProduct = productsAPI.price * productQuantity;
-      console.log(productsAPI.price);
-      console.log(productQuantity);
-      console.log(totalPricePerProduct);
+  document.getElementById("totalQuantity").innerHTML = totalQuantityBasket;
+  return productQuantity
+};
 
-      Qtotal += productQuantity;
-      document.getElementById("totalQuantity").innerHTML = Qtotal;
-      console.log(Qtotal);
-    
-      arrayPrices.push(totalPricePerProduct);
-    
-      arrayPrices.forEach((elementPrice) => {
-      PriceTotal += elementPrice;
-      console.log(PriceTotal);
-      document.getElementById("totalPrice").innerHTML = PriceTotal;
-      console.log(PriceTotal);})
-    });
-}
+//Calcul du prix total panier
+colculPriceTotal = () => {
+  let totalPriceBasket = 0;
+  let totalPricePerProduct = productsAPI.price * productQuantity;
+
+  arrayPrices.push(totalPricePerProduct);
+  arrayPrices.forEach((elementPrice) => {
+    totalPriceBasket += elementPrice;
+
+    document.getElementById("totalPrice").innerHTML = totalPriceBasket;
+  });
+};

@@ -1,51 +1,57 @@
-/*Fonction permettant le rafraichissement uniquement du prix total et de la quantité total
+/*Fonction permettant l'affichage du prix total et de la quantité total
 Cette fonction est appelé pour la création innitial du DOM puis lors dune modification de quantité produit et lors d'un suppression*/
 
 calculBasket = () => {
-  document.getElementById("totalPrice").innerHTML = "";
   let arrayPrices = [];
 
-  getArrayLocalstorage = () => {
-    let arrayRecup = localStorage.getItem("arrayProd");
-    let arrayLS = JSON.parse(arrayRecup);
-    return arrayLS;
-  };
-  const dataStorage = getArrayLocalstorage();
-  console.log(dataStorage);
-  for (i = 0; i < dataStorage.length; i++) {
-    let idArray = dataStorage[i].id;
-    let productQuantity = dataStorage[i].quantity;
+  let arrayRecup = localStorage.getItem("arrayProd");
+  let arrayLS = JSON.parse(arrayRecup);
+
+  let totalQuantityBasket = 0;
+
+  for (i = 0; i < arrayLS.length; i++) {
+    let idArray = arrayLS[i].id;
+    let productQuantity = arrayLS[i].quantity;
 
     fetch("http://localhost:3000/api/products/" + idArray)
+      //On récupèere le resultat de la recherche au format JSON
       .then((dataProduct) => dataProduct.json())
 
+      //On récupère sa vraie valeur
       .then((productsAPI) => {
         //Calcul de la quantité toltal panier
-        let totalQuantityBasket = 0;
-        totalQuantityBasket += productQuantity;
+        (calculQuantity = () => {
+          totalQuantityBasket += productQuantity;
 
-        document.getElementById("totalQuantity").innerHTML =
-          totalQuantityBasket;
+          document.getElementById("totalQuantity").innerHTML =
+            totalQuantityBasket;
+        })();
 
         //Calcul du prix total panier
-        let totalPriceBasket = 0;
-        let totalPricePerProduct = productsAPI.price * productQuantity;
+        (colculPriceTotal = () => {
+          let totalPriceBasket = 0;
+          let totalPricePerProduct = productsAPI.price * productQuantity;
 
-        arrayPrices.push(totalPricePerProduct);
-        arrayPrices.forEach((elementPrice) => {
-          totalPriceBasket += elementPrice;
-
-          document.getElementById("totalPrice").innerHTML = totalPriceBasket;
-        });
+          arrayPrices.push(totalPricePerProduct);
+          arrayPrices.forEach((elementPrice) => {
+            totalPriceBasket += elementPrice;
+            console.log(productQuantity);
+            document.getElementById("totalPrice").innerHTML = totalPriceBasket;
+          });
+        })();
       });
   }
+  localStorage.setItem("arrayProd", JSON.stringify(arrayLS));
 };
+
+//Initialisation d'un tableau des id de produits stockés dans le localstorage
+const arryaIdproducts = [];
 
 //Recuperation produits du le localStorage
 let arrayRecup = localStorage.getItem("arrayProd");
 let arrayLS = JSON.parse(arrayRecup);
 
-//nous parcourons notre tableau
+//nous parcourons notre tableau du LS
 for (i = 0; i < arrayLS.length; i++) {
   let idArray = arrayLS[i].id;
   let colorArray = arrayLS[i].color;
@@ -131,12 +137,13 @@ for (i = 0; i < arrayLS.length; i++) {
       deleteItem.className = "deleteItem";
       deleteItem.innerText = "Supprimer";
 
+      //Affichage initial du total quantité et prix
       calculBasket();
-      //----------------------------Foncion de la modification de la quantité produit------------------------
 
-      //Parent produit contenant les informations (id et couleur) du produit
+      //Balise du DOM ou se trouve les informations id et couleur produit, c'est aussi notre contenant produit
       const baliseArticle = divDelete.closest(":not(div)");
 
+      //----------------------------Foncion de la modification de la quantité produit------------------------
       inputNumber.onchange = () => {
         if (inputNumber.value <= 100 && inputNumber.value > 0) {
           const productCurrentQuantity = arrayLS.find(
@@ -145,7 +152,6 @@ for (i = 0; i < arrayLS.length; i++) {
               o.color === baliseArticle.dataset.color
           );
           productCurrentQuantity.quantity = +inputNumber.value;
-
           localStorage.setItem("arrayProd", JSON.stringify(arrayLS));
         } else {
           alert("Saississez une quantité de Kanap entre 1 et 100 éléments");
@@ -154,26 +160,39 @@ for (i = 0; i < arrayLS.length; i++) {
       };
 
       //------------------------------------Fonction de produit à supprimer----------------------------------
+
+      /*Au click du boutun supprimé, nous recherchons le produit concerné, grace à son id et sa couleur
+      puis en recuperant son index dans le tableau remplie grace à notre boucle principal nous ponvons 
+      le supprimer et renvoyer le tableau de produits dans le local storage */
       divDelete.onclick = () => {
         const productfound = arrayLS.find(
           (h) =>
             h.id === baliseArticle.dataset.id &&
             h.color === baliseArticle.dataset.color
         );
-        const array = arrayLS.filter((productLS) => productLS != productfound);
 
-        localStorage.setItem("arrayProd", JSON.stringify(array));
+        const index = arrayLS.indexOf(productfound);
+        arrayLS.splice(index, 1);
+        localStorage.setItem("arrayProd", JSON.stringify(arrayLS));
+
+        const productDelete = baliseArticle.closest(":not(div)");
+        productDelete.remove();
+
         calculBasket();
-        //Suppression dans le DOM
-        baliseArticle.remove();
       };
     });
+
+  /*Tableau qui contient les id des produits stockés dans notre localstorage
+  (anticipé pour la commande)*/
+  arryaIdproducts.push(idArray);
 }
 
 //-------------------------------Validation du formulaire------------------------------
 
 //Variables contenants de regex
+
 //Manque lettres accentuées**********************************************
+//*********************************************************************************************** */
 const regexFirstName = /^([A-Za-z]{2})?([-]{0,1})?([A-Za-z]{2,20})$/;
 const regexLastName = /^([A-Za-z]{2})?([-]{0,1})?([A-Za-z]{2,20})$/;
 const regexAddress = /^[a-zA-Z0-9\s,'-âä]{10,50}$/;
@@ -181,9 +200,10 @@ const regexCity = /^([A-Za-z]{2})?([-]{0,1})?([A-Za-z]{2,20})$/;
 const regexEmail =
   /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))/;
 
-//Création de contions sur onchange de chaques input du formulaire de contact
+//Création de conditions sur onchange de chaques input du formulaire de contact
 const inputFirstName = document.querySelector("#firstName");
-inputFirstName.onchange = () => {
+
+inputFirstName.oninput = () => {
   let firstName = inputFirstName.value;
   const firstNameErrorMsg = document.querySelector("#firstNameErrorMsg");
 
@@ -197,7 +217,8 @@ inputFirstName.onchange = () => {
 };
 //------------------------------
 const inputLastName = document.querySelector("#lastName");
-inputLastName.onchange = () => {
+
+inputLastName.oninput = () => {
   let lastName = inputLastName.value;
   const lastNameErrorMsg = document.querySelector("#lastNameErrorMsg");
 
@@ -212,7 +233,8 @@ inputLastName.onchange = () => {
 
 //------------------------------
 const inputAddress = document.querySelector("#address");
-inputAddress.onchange = () => {
+
+inputAddress.oninput = () => {
   let address = inputAddress.value;
   const addressErrorMsg = document.querySelector("#addressErrorMsg");
 
@@ -227,7 +249,8 @@ inputAddress.onchange = () => {
 //-------------------------------
 
 const inputCity = document.querySelector("#city");
-inputCity.onchange = () => {
+
+inputCity.oninput = () => {
   let city = inputCity.value;
   const cityErrorMsg = document.querySelector("#cityErrorMsg");
 
@@ -242,7 +265,8 @@ inputCity.onchange = () => {
 //--------------------------------
 
 const inputEmail = document.querySelector("#email");
-inputEmail.onchange = () => {
+
+inputEmail.oninput = () => {
   let email = inputEmail.value;
   const emailErrorMsg = document.querySelector("#emailErrorMsg");
 
@@ -258,7 +282,6 @@ inputEmail.onchange = () => {
 //Au click du bouton on impose que tout les champs soient saisis correctements
 const buttunOrder = document.querySelector("#order");
 buttunOrder.onclick = () => {
-
   let firstName = inputFirstName.value;
   let lastName = inputLastName.value;
   let address = inputAddress.value;
@@ -276,6 +299,8 @@ buttunOrder.onclick = () => {
   console.log(regexAddress.test(address));
   console.log(regexEmail.test(email));
 
+  //Contrôler l'envoi car impossible si la balise "type" est renseigné avec "suubmit"*******************************************
+  //******************************************************************************************************************************
   if (
     regexFirstName.test(firstName) &&
     regexLastName.test(lastName) &&
@@ -283,17 +308,33 @@ buttunOrder.onclick = () => {
     regexAddress.test(address) &&
     regexEmail.test(email) === true
   ) {
-    let contact = {
-      firstName: inputFirstName.value,
-      lastName: inputLastName.value,
-      address: inputAddress.value,
-      city: inputCity.value,
-      email: inputEmail.value,
+    /*Si la condition est remplie ,on peut envoyer notre objet attendu par l'API
+    (d'après la spec.) à savoir : l'objet contact et le tableau d'id(represantant les produits) sous formr de string*/
+    const order = {
+      contact: {
+        firstName: inputFirstName.value,
+        lastName: inputLastName.value,
+        address: inputAddress.value,
+        city: inputCity.value,
+        email: inputEmail.value,
+      },
+      products: arryaIdproducts,
     };
+    console.log(typeof products);
+    
+    fetch("http://localhost:3000/api/products/order", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(order),
+    })
+      .then((response) => response.json())
+      .then((res) => {
+        const idOfCommand = res;
+        console.log(idOfCommand);
 
-    let form = JSON.stringify(contact);
-    localStorage.setItem("FormContac", form);
-    console.log(contact);
+        //On envoi l'id de l'url en page confirmation pour le recuperer
+        window.location.href = `confirmation.html?${idOfCommand.orderId}`;
+      });
   } else {
     alert("Vérifiez votre saisie");
   }
