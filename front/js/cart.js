@@ -5,7 +5,6 @@ calculBasket = () => {
   document.getElementById("totalPrice").innerHTML = "";
   let arrayPrices = [];
 
-  let Qtotal = 0;
   getArrayLocalstorage = () => {
     let arrayRecup = localStorage.getItem("arrayProd");
     let arrayLS = JSON.parse(arrayRecup);
@@ -21,19 +20,22 @@ calculBasket = () => {
       .then((dataProduct) => dataProduct.json())
 
       .then((productsAPI) => {
-        let totalPricePerProduct = productsAPI.price * productQuantity;
-        let totalPrice = 0;
+        //Calcul de la quantité toltal panier
+        let totalQuantityBasket = 0;
+        totalQuantityBasket += productQuantity;
 
-        Qtotal += productQuantity;
-        document.getElementById("totalQuantity").innerHTML = Qtotal;
+        document.getElementById("totalQuantity").innerHTML =
+          totalQuantityBasket;
+
+        //Calcul du prix total panier
+        let totalPriceBasket = 0;
+        let totalPricePerProduct = productsAPI.price * productQuantity;
 
         arrayPrices.push(totalPricePerProduct);
-
         arrayPrices.forEach((elementPrice) => {
-          totalPrice += elementPrice;
-          console.log(elementPrice);
-          document.getElementById("totalPrice").innerHTML = totalPrice;
-          console.log(totalPrice);
+          totalPriceBasket += elementPrice;
+
+          document.getElementById("totalPrice").innerHTML = totalPriceBasket;
         });
       });
   }
@@ -129,7 +131,6 @@ for (i = 0; i < arrayLS.length; i++) {
       deleteItem.className = "deleteItem";
       deleteItem.innerText = "Supprimer";
 
-
       calculBasket();
       //----------------------------Foncion de la modification de la quantité produit------------------------
 
@@ -193,7 +194,6 @@ inputFirstName.onchange = () => {
     firstNameErrorMsg.textContent = "Veuillez entrer un prénon valide svp!";
     inputFirstName.style.border = "1px solid red";
   }
-  
 };
 //------------------------------
 const inputLastName = document.querySelector("#lastName");
@@ -208,7 +208,6 @@ inputLastName.onchange = () => {
     lastNameErrorMsg.textContent = "Veuillez entrer un prénon valide svp!";
     inputLastName.style.border = "1px solid red";
   }
-  
 };
 
 //------------------------------
@@ -224,7 +223,6 @@ inputAddress.onchange = () => {
     addressErrorMsg.textContent = "Veuillez entrer un prénon valide svp!";
     inputAddress.style.border = "1px solid red";
   }
-  
 };
 //-------------------------------
 
@@ -240,7 +238,6 @@ inputCity.onchange = () => {
     cityErrorMsg.textContent = "Veuillez entrer un prénon valide svp!";
     inputCity.style.border = "1px solid red";
   }
-  
 };
 //--------------------------------
 
@@ -256,11 +253,12 @@ inputEmail.onchange = () => {
     emailErrorMsg.textContent = "Veuillez entrer un prénon valide svp!";
     inputEmail.style.border = "1px solid red";
   }
-  
 };
 
+//Au click du bouton on impose que tout les champs soient saisis correctements
 const buttunOrder = document.querySelector("#order");
 buttunOrder.onclick = () => {
+
   let firstName = inputFirstName.value;
   let lastName = inputLastName.value;
   let address = inputAddress.value;
@@ -279,10 +277,10 @@ buttunOrder.onclick = () => {
   console.log(regexEmail.test(email));
 
   if (
-    regexFirstName.test(firstName) === true &&
-    regexLastName.test(lastName) === true &&
-    regexCity.test(city) === true &&
-    regexAddress.test(address) === true &&
+    regexFirstName.test(firstName) &&
+    regexLastName.test(lastName) &&
+    regexCity.test(city) &&
+    regexAddress.test(address) &&
     regexEmail.test(email) === true
   ) {
     let contact = {
