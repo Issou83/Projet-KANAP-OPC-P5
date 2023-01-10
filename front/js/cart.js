@@ -1,68 +1,42 @@
-const getLS = (getArrayLocalstorage = () => {
-    let arrayRecup = localStorage.getItem("arrayProd");
-    let arrayLS = JSON.parse(arrayRecup);
-    return arrayLS
-  })()
-console.log(getLS);
-
-/*Fonction permettant l'affichage du prix total et de la quantité total
-Cette fonction est appelé pour la création initial du DOM, puis lors d'une modification de quantité d'une suppression*/
-
-calculBasket = () => {
-  const arrayPrices = [];
-  let totalQuantityBasket = 0;
-  
-  for (i = 0; i < getLS.length; i++) {
-    let idArray = getLS[i].id;
-    let productQuantity = getLS[i].quantity;
-
-    fetch("http://localhost:3000/api/products/" + idArray)
-      //On récupèere le resultat de la recherche au format JSON
-      .then((dataProduct) => dataProduct.json())
-
-      //On récupère sa vraie valeur
-      .then((productsAPI) => {
-        //Calcul de la quantité toltal panier
-        (calculQuantity = () => {
-          totalQuantityBasket += productQuantity;
-
-          document.getElementById("totalQuantity").innerHTML =
-            totalQuantityBasket;
-        })();
-
-        //Calcul du prix total panier
-
-        (colculPriceTotal = () => {
-            let totalPriceBasket = 0;
-          //On calcul le prix total par produit, pour les stocker dans un tableau
-          let totalPricePerProduct = productsAPI.price * productQuantity;
-
-            //Le calcul du prix total panier ce fera a partir de ce tableau
-          arrayPrices.push(totalPricePerProduct);
-          arrayPrices.forEach((elementPrice) => {
-            totalPriceBasket += elementPrice;
-
-            document.getElementById("totalPrice").innerHTML = totalPriceBasket;
-          });
-        })();
-      });
+function getCart() {
+  let arrayRecup = localStorage.getItem("arrayProd");
+  if (arrayRecup === null) {
+    return [];
   }
-  localStorage.setItem("arrayProd", JSON.stringify(getLS));
-};
+  return JSON.parse(arrayRecup);
+}
 
-//Initialisation d'un tableau des id de produits stockés dans le localstorage
+async function renderTotal() {
+  let totalQuantity = 0;
+  let totalPrice = 0;
+  cart = getCart();
+
+  for (let i = 0; i < cart.length; i++) {
+    totalQuantity += cart[i].quantity;
+
+    let product = await fetch("http://localhost:3000/api/products/" + cart[i].id
+    ).then((response) => {
+      return response.json();
+    });
+
+    totalPrice += cart[i].quantity * product.price;
+  }
+  document.getElementById("totalQuantity").innerHTML = totalQuantity;
+  document.getElementById("totalPrice").innerHTML = totalPrice;
+}
+
 const arryaIdproducts = [];
 
-//nous parcourons notre tableau du LS
-for (i = 0; i < getLS.length; i++) {
-  let idArray = getLS[i].id;
-  let colorArray = getLS[i].color;
-  let quantityArray = getLS[i].quantity;
+cart = getCart();
+for (let i = 0; i < cart.length; i++) {
+  let idProduct = cart[i].id;
+  let colorProduct = cart[i].color;
+  let quantityProduct = cart[i].quantity;
 
   //-----------------------Création des elements dans le DOM------------------------
 
-  //Envoi d'une requête HTTP de type GET au service web
-  fetch("http://localhost:3000/api/products/" + idArray)
+ 
+  fetch("http://localhost:3000/api/products/" + idProduct)
     .then((dataProduct) => dataProduct.json())
 
     .then((product) => {
@@ -71,8 +45,8 @@ for (i = 0; i < getLS.length; i++) {
       const containerProduct = document.createElement("article");
       sectionProduct.appendChild(containerProduct);
       containerProduct.className = `cart__item`;
-      containerProduct.dataset.id = idArray;
-      containerProduct.dataset.color = colorArray;
+      containerProduct.dataset.id = idProduct;
+      containerProduct.dataset.color = colorProduct;
 
       //Création de la div de l'image et de la div du contenu de la carte
       const divImage = document.createElement("div");
@@ -100,7 +74,7 @@ for (i = 0; i < getLS.length; i++) {
 
       const productColor = document.createElement("p");
       divDescription.appendChild(productColor);
-      productColor.innerText = colorArray;
+      productColor.innerText = colorProduct;
 
       let productPrice = document.createElement("p");
       divDescription.appendChild(productPrice);
@@ -127,7 +101,7 @@ for (i = 0; i < getLS.length; i++) {
       inputNumber.setAttribute("name", "itemQuantity");
       inputNumber.setAttribute("min", 1);
       inputNumber.setAttribute("max", 100);
-      inputNumber.setAttribute("value", quantityArray);
+      inputNumber.setAttribute("value", quantityProduct);
 
       //Création du "bouton" supprimer
       const divDelete = document.createElement("div");
@@ -140,7 +114,7 @@ for (i = 0; i < getLS.length; i++) {
       deleteItem.innerText = "Supprimer";
 
       //Affichage initial du total quantité et prix
-      calculBasket();
+      renderTotal();
 
       //Balise du DOM ou se trouve les informations id et couleur produit, c'est aussi notre contenant produit
       const baliseArticle = divDelete.closest(":not(div)");
@@ -148,44 +122,41 @@ for (i = 0; i < getLS.length; i++) {
       //----------------------------Foncion de la modification de la quantité produit------------------------
       inputNumber.onchange = () => {
         if (inputNumber.value <= 100 && inputNumber.value > 0) {
-          const productCurrentQuantity = getLS.find(
+          cart = getCart;
+          const productCurrentQuantity = cart.find(
             (o) =>
               o.id === baliseArticle.dataset.id &&
               o.color === baliseArticle.dataset.color
           );
-          productCurrentQuantity.quantity = +inputNumber.value;
-      
+          productCurrentQuantity.quantity = inputNumber.value;
         } else {
           alert("Saississez une quantité de Kanap entre 1 et 100 éléments");
         }
-        calculBasket();
+        renderTotal();
       };
 
       //------------------------------------Fonction de produit à supprimer----------------------------------
-
-      /*Au click du boutun supprimé, nous recherchons le produit concerné, grace à son id et sa couleur
-      puis en recuperant son index dans le tableau remplie grace à notre boucle principal nous ponvons 
-      le supprimer et renvoyer le tableau de produits dans le local storage */
       divDelete.onclick = () => {
-        const productfound = getLS.find(
+        cart = getCart();
+        const productfound = cart.find(
           (h) =>
             h.id === baliseArticle.dataset.id &&
             h.color === baliseArticle.dataset.color
         );
 
-        const index = getLS.indexOf(productfound);
-        getLS.splice(index, 1);
-      
+        const index = cart.indexOf(productfound);
+        cart.splice(index, 1);
+
         const productDelete = baliseArticle.closest(":not(div)");
         productDelete.remove();
 
-        calculBasket();
+        renderTotal();
       };
     });
 
   /*Tableau qui contient les id des produits stockés dans notre localstorage
   (anticipé pour la commande)*/
-  arryaIdproducts.push(idArray);
+  arryaIdproducts.push(idProduct);
 }
 
 //-------------------------------Validation du formulaire------------------------------
@@ -283,11 +254,13 @@ inputEmail.oninput = () => {
 //Au click du bouton on impose que tout les champs soient saisis correctements
 const buttunOrder = document.querySelector("#order");
 buttunOrder.onclick = () => {
+  //
   let firstName = inputFirstName.value;
   let lastName = inputLastName.value;
   let address = inputAddress.value;
   let city = inputCity.value;
   let email = inputEmail.value;
+
   console.log(inputFirstName.value);
   console.log(inputLastName.value);
   console.log(inputAddress.value);
