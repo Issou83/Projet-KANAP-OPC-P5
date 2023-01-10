@@ -12,7 +12,7 @@ async function renderTotal() {
   cart = getCart();
 
   for (let i = 0; i < cart.length; i++) {
-    totalQuantity += cart[i].quantity;
+    totalQuantity += parseInt(cart[i].quantity);
 
     let product = await fetch("http://localhost:3000/api/products/" + cart[i].id
     ).then((response) => {
@@ -154,7 +154,7 @@ for (let i = 0; i < cart.length; i++) {
 
         const productDelete = baliseArticle.closest(":not(div)");
         productDelete.remove();
-        
+
         let arrayh = JSON.stringify(cart);
           localStorage.setItem("arrayProd", arrayh);
         renderTotal();
