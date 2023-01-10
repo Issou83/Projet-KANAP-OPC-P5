@@ -122,17 +122,22 @@ for (let i = 0; i < cart.length; i++) {
       //----------------------------Foncion de la modification de la quantité produit------------------------
       inputNumber.onchange = () => {
         if (inputNumber.value <= 100 && inputNumber.value > 0) {
-          cart = getCart;
+          cart = getCart();
           const productCurrentQuantity = cart.find(
             (o) =>
               o.id === baliseArticle.dataset.id &&
               o.color === baliseArticle.dataset.color
           );
           productCurrentQuantity.quantity = inputNumber.value;
+
+          let arrayh = JSON.stringify(cart);
+          localStorage.setItem("arrayProd", arrayh);
+
         } else {
           alert("Saississez une quantité de Kanap entre 1 et 100 éléments");
         }
         renderTotal();
+        console.log(cart);
       };
 
       //------------------------------------Fonction de produit à supprimer----------------------------------
@@ -149,7 +154,9 @@ for (let i = 0; i < cart.length; i++) {
 
         const productDelete = baliseArticle.closest(":not(div)");
         productDelete.remove();
-
+        
+        let arrayh = JSON.stringify(cart);
+          localStorage.setItem("arrayProd", arrayh);
         renderTotal();
       };
     });
