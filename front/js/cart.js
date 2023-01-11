@@ -1,3 +1,6 @@
+//--------------------------Fonctions reutilisables----------------------------- 
+
+//Recuperation du tableau de produits present dans le localstorage
 function getCart() {
   let arrayRecup = localStorage.getItem("arrayProd");
   if (arrayRecup === null) {
@@ -6,6 +9,13 @@ function getCart() {
   return JSON.parse(arrayRecup);
 }
 
+//Envoi du taleau produits dans le local storage
+function setCart() {
+  let arrayh = JSON.stringify(cart);
+  localStorage.setItem("arrayProd", arrayh); 
+}
+
+//Calcul panier: total quantite et total prix 
 async function renderTotal() {
   let totalQuantity = 0;
   let totalPrice = 0;
@@ -25,17 +35,16 @@ async function renderTotal() {
   document.getElementById("totalPrice").innerHTML = totalPrice;
 }
 
+//Initialisation d'un tableau qui contiendra tout les id des produits dans le panier
 const arryaIdproducts = [];
 
+//---Création des cartes de produits, affichage du prix et quantite total dans le DOM-----
 cart = getCart();
 for (let i = 0; i < cart.length; i++) {
   let idProduct = cart[i].id;
   let colorProduct = cart[i].color;
   let quantityProduct = cart[i].quantity;
 
-  //-----------------------Création des elements dans le DOM------------------------
-
- 
   fetch("http://localhost:3000/api/products/" + idProduct)
     .then((dataProduct) => dataProduct.json())
 
@@ -119,7 +128,7 @@ for (let i = 0; i < cart.length; i++) {
       //Balise du DOM ou se trouve les informations id et couleur produit, c'est aussi notre contenant produit
       const baliseArticle = divDelete.closest(":not(div)");
 
-      //----------------------------Foncion de la modification de la quantité produit------------------------
+      //----------------------------Modification de la quantité produit------------------------
       inputNumber.onchange = () => {
         if (inputNumber.value <= 100 && inputNumber.value > 0) {
           cart = getCart();
@@ -130,8 +139,7 @@ for (let i = 0; i < cart.length; i++) {
           );
           productCurrentQuantity.quantity = inputNumber.value;
 
-          let arrayh = JSON.stringify(cart);
-          localStorage.setItem("arrayProd", arrayh);
+          setCart()
 
         } else {
           alert("Saississez une quantité de Kanap entre 1 et 100 éléments");
@@ -140,7 +148,7 @@ for (let i = 0; i < cart.length; i++) {
         console.log(cart);
       };
 
-      //------------------------------------Fonction de produit à supprimer----------------------------------
+      //------------------------------------Suppression produit----------------------------------
       divDelete.onclick = () => {
         cart = getCart();
         const productfound = cart.find(
@@ -155,13 +163,12 @@ for (let i = 0; i < cart.length; i++) {
         const productDelete = baliseArticle.closest(":not(div)");
         productDelete.remove();
 
-        let arrayh = JSON.stringify(cart);
-          localStorage.setItem("arrayProd", arrayh);
+        setCart()
         renderTotal();
       };
     });
 
-  /*Tableau qui contient les id des produits stockés dans notre localstorage
+  /*Injection des id produits stockés dans notre localstorage
   (anticipé pour la commande)*/
   arryaIdproducts.push(idProduct);
 }
@@ -171,7 +178,7 @@ for (let i = 0; i < cart.length; i++) {
 //Variables contenants de regex
 
 //Manque lettres accentuées**********************************************
-//*********************************************************************************************** */
+//************************************************************************************************/
 const regexFirstName = /^([A-Za-z]{2})?([-]{0,1})?([A-Za-z]{2,20})$/;
 const regexLastName = /^([A-Za-z]{2})?([-]{0,1})?([A-Za-z]{2,20})$/;
 const regexAddress = /^[a-zA-Z0-9\s,'-âä]{10,50}$/;
@@ -179,7 +186,7 @@ const regexCity = /^([A-Za-z]{2})?([-]{0,1})?([A-Za-z]{2,20})$/;
 const regexEmail =
   /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))/;
 
-//Création de conditions sur onchange de chaques input du formulaire de contact
+/*Creation de conditions de validation du formulaire, chaques input est ecoute a sa modification */
 const inputFirstName = document.querySelector("#firstName");
 
 inputFirstName.oninput = () => {
@@ -267,18 +274,6 @@ buttunOrder.onclick = () => {
   let address = inputAddress.value;
   let city = inputCity.value;
   let email = inputEmail.value;
-
-  console.log(inputFirstName.value);
-  console.log(inputLastName.value);
-  console.log(inputAddress.value);
-  console.log(inputCity.value);
-  console.log(inputEmail.value);
-
-  console.log(regexFirstName.test(firstName));
-  console.log(regexLastName.test(lastName));
-  console.log(regexCity.test(city));
-  console.log(regexAddress.test(address));
-  console.log(regexEmail.test(email));
 
   //Contrôler l'envoi car impossible si la balise "type" est renseigné avec "suubmit"*******************************************
   //******************************************************************************************************************************
