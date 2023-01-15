@@ -1,16 +1,10 @@
-//Envoi d'une requête HTTP de type GET au service web
+//Récupération des données des produits et leur affichage sur la page
 fetch("http://localhost:3000/api/products")
-  //Récupération du tableau "products" au format json
   .then((data) => data.json())
-  //Récupèration des données
   .then((products) => {
-    //Boucle nous permettant d'extraire chaque objet du tableau "products"
+
     for (let product of products) {
-      console.log(product);
-      //Injection des éléments dans le DOM : dans notre section portant l'id `items` "
 
-
-      
       let items = document.getElementById("items");
       const newLink = document.createElement("a");
       newLink.setAttribute(`href`, `./product.html?id=${product._id}`);

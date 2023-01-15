@@ -1,21 +1,22 @@
-//--------------------------Fonctions reutilisables----------------------------- 
+//--------------------------Fonctions réutilisables-----------------------------
 
-//Recuperation du tableau de produits present dans le localstorage
+//Récupération du tableau de produits pésent dans le localstorage
 function getCart() {
   let arrayRecup = localStorage.getItem("arrayProd");
+  
   if (arrayRecup === null) {
     return [];
   }
-  return JSON.parse(arrayRecup);
+  return JSON.parse(arrayRecup)
 }
 
 //Envoi du taleau produits dans le local storage
-function setCart() {
-  let arrayh = JSON.stringify(cart);
-  localStorage.setItem("arrayProd", arrayh); 
+function addToLocalStorage() {
+  let arrayProducts = JSON.stringify(cart);
+  localStorage.setItem("arrayProd", arrayProducts);
 }
 
-//Calcul panier: total quantite et total prix 
+//Calcul panier: total quantite et total prix
 async function renderTotal() {
   let totalQuantity = 0;
   let totalPrice = 0;
@@ -24,7 +25,8 @@ async function renderTotal() {
   for (let i = 0; i < cart.length; i++) {
     totalQuantity += parseInt(cart[i].quantity);
 
-    let product = await fetch("http://localhost:3000/api/products/" + cart[i].id
+    let product = await fetch(
+      "http://localhost:3000/api/products/" + cart[i].id
     ).then((response) => {
       return response.json();
     });
@@ -34,13 +36,17 @@ async function renderTotal() {
   document.getElementById("totalQuantity").innerHTML = totalQuantity;
   document.getElementById("totalPrice").innerHTML = totalPrice;
 }
+//--------------------------------------------------------------------------------------
+
 
 //Initialisation d'un tableau qui contiendra tout les id des produits dans le panier
 const arryaIdproducts = [];
 
 //---Création des cartes de produits, affichage du prix et quantite total dans le DOM-----
 cart = getCart();
+
 for (let i = 0; i < cart.length; i++) {
+  
   let idProduct = cart[i].id;
   let colorProduct = cart[i].color;
   let quantityProduct = cart[i].quantity;
@@ -49,7 +55,7 @@ for (let i = 0; i < cart.length; i++) {
     .then((dataProduct) => dataProduct.json())
 
     .then((product) => {
-      //Création du container de produit
+      //Création du container du produit
       const sectionProduct = document.getElementById("cart__items");
       const containerProduct = document.createElement("article");
       sectionProduct.appendChild(containerProduct);
@@ -67,12 +73,12 @@ for (let i = 0; i < cart.length; i++) {
       image.setAttribute("src", product.imageUrl);
       image.setAttribute("alt", `Photographie d'un canapé`);
 
-      //Cration de la div "contenue"
+      //Création de la div "contenue"
       const divContent = document.createElement("div");
       containerProduct.appendChild(divContent);
       divContent.className = `cart__item__content`;
 
-      //Cration de la div "description"
+      //Création de la div "déscription"
       const divDescription = document.createElement("div");
       divContent.appendChild(divDescription);
       divDescription.className = `cart__item__content__description`;
@@ -139,8 +145,7 @@ for (let i = 0; i < cart.length; i++) {
           );
           productCurrentQuantity.quantity = inputNumber.value;
 
-          setCart()
-
+          addToLocalStorage();
         } else {
           alert("Saississez une quantité de Kanap entre 1 et 100 éléments");
         }
@@ -163,7 +168,7 @@ for (let i = 0; i < cart.length; i++) {
         const productDelete = baliseArticle.closest(":not(div)");
         productDelete.remove();
 
-        setCart()
+        addToLocalStorage();
         renderTotal();
       };
     });
@@ -176,17 +181,14 @@ for (let i = 0; i < cart.length; i++) {
 //-------------------------------Validation du formulaire------------------------------
 
 //Variables contenants de regex
-
-//Manque lettres accentuées**********************************************
-//************************************************************************************************/
-const regexFirstName = /^([A-Za-z]{2})?([-]{0,1})?([A-Za-z]{2,20})$/;
-const regexLastName = /^([A-Za-z]{2})?([-]{0,1})?([A-Za-z]{2,20})$/;
+const regexFirstName = /^([A-Za-záàâäãåçéèêëíìîïñóòôöõúùûüýÿæœÁÀÂÄÃÅÇÉÈÊËÍÌÎÏÑÓÒÔÖÕÚÙÛÜÝŸÆŒ]{2})?([-]{0,1})?([A-Za-z]{2,20})$/;
+const regexLastName = /^([A-Za-záàâäãåçéèêëíìîïñóòôöõúùûüýÿæœÁÀÂÄÃÅÇÉÈÊËÍÌÎÏÑÓÒÔÖÕÚÙÛÜÝŸÆŒ]{2})?([-]{0,1})?([A-Za-z]{2,20})$/;
 const regexAddress = /^[a-zA-Z0-9\s,'-âä]{10,50}$/;
 const regexCity = /^([A-Za-z]{2})?([-]{0,1})?([A-Za-z]{2,20})$/;
 const regexEmail =
   /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))/;
 
-/*Creation de conditions de validation du formulaire, chaques input est ecoute a sa modification */
+//Creation de conditions de validation du formulaire pour chaques input
 const inputFirstName = document.querySelector("#firstName");
 
 inputFirstName.oninput = () => {
@@ -265,17 +267,19 @@ inputEmail.oninput = () => {
   }
 };
 
-//Au click du bouton on impose que tout les champs soient saisis correctements
+/**Au click du bouton on impose que tout les champs soient saisis correctements
+*Si la condition est remplie ,on peut envoyer notre objet attendu par l'API
+*/
 const buttunOrder = document.querySelector("#order");
 buttunOrder.onclick = () => {
-  //
+
   let firstName = inputFirstName.value;
   let lastName = inputLastName.value;
   let address = inputAddress.value;
   let city = inputCity.value;
   let email = inputEmail.value;
 
-  //Contrôler l'envoi car impossible si la balise "type" est renseigné avec "suubmit"*******************************************
+  //Contrôler l'envoi car impossible si la balise "type" est renseigné avec "submit"*******************************************
   //******************************************************************************************************************************
   if (
     regexFirstName.test(firstName) &&
@@ -284,8 +288,8 @@ buttunOrder.onclick = () => {
     regexAddress.test(address) &&
     regexEmail.test(email) === true
   ) {
-    /*Si la condition est remplie ,on peut envoyer notre objet attendu par l'API
-    (d'après la spec.) à savoir : l'objet contact et le tableau d'id(represantant les produits) sous formr de string*/
+    //Si la condition est remplie ,on peut envoyer notre objet attendu par l'API
+    
     const order = {
       contact: {
         firstName: inputFirstName.value,
@@ -311,6 +315,7 @@ buttunOrder.onclick = () => {
         //On envoi l'id de l'url en page confirmation pour le recuperer
         window.location.href = `confirmation.html?${idOfCommand.orderId}`;
       });
+      console.log(order.id);
   } else {
     alert("Vérifiez votre saisie");
   }
