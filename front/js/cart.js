@@ -32,10 +32,12 @@ async function renderTotal() {
     });
 
     totalPrice += cart[i].quantity * product.price;
+    
   }
   document.getElementById("totalQuantity").innerHTML = totalQuantity;
   document.getElementById("totalPrice").innerHTML = totalPrice;
 }
+console.log(totalPrice);
 //--------------------------------------------------------------------------------------
 
 
@@ -128,8 +130,8 @@ for (let i = 0; i < cart.length; i++) {
       deleteItem.className = "deleteItem";
       deleteItem.innerText = "Supprimer";
 
-      //Affichage initial du total quantité et prix
-      renderTotal();
+      
+      // renderTotal();
 
       //Balise du DOM ou se trouve les informations id et couleur produit, c'est aussi notre contenant produit
       const baliseArticle = divDelete.closest(":not(div)");
@@ -143,7 +145,7 @@ for (let i = 0; i < cart.length; i++) {
               o.id === baliseArticle.dataset.id &&
               o.color === baliseArticle.dataset.color
           );
-          productCurrentQuantity.quantity = inputNumber.value;
+          productCurrentQuantity.quantity = parseInt(inputNumber.value);
 
           addToLocalStorage();
         } else {
@@ -178,6 +180,8 @@ for (let i = 0; i < cart.length; i++) {
   arryaIdproducts.push(idProduct);
 }
 
+//Affichage initial du total quantité et prix
+renderTotal();
 //-------------------------------Validation du formulaire------------------------------
 
 //Variables contenants de regex
@@ -287,7 +291,7 @@ buttunOrder.onclick = () => {
     regexCity.test(city) &&
     regexAddress.test(address) &&
     regexEmail.test(email) === true
-  ) {
+    && cart.length != 0) {
     //Si la condition est remplie ,on peut envoyer notre objet attendu par l'API
     
     const order = {
@@ -315,8 +319,8 @@ buttunOrder.onclick = () => {
         //On envoi l'id de l'url en page confirmation pour le recuperer
         window.location.href = `confirmation.html?${idOfCommand.orderId}`;
       });
-      console.log(order.id);
+
   } else {
-    alert("Vérifiez votre saisie");
+    alert("Vérifiez votre saisie et faites votre choix de kanap");
   }
 };

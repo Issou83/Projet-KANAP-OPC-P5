@@ -29,29 +29,26 @@ fetch("http://localhost:3000/api/products/" + idProduct)
 
 //Fonction d'envoi au localStorage
 
-  function addToLocalStorage() {
-    let arrayProducts = JSON.stringify(cart);
-    localStorage.setItem("arrayProd", arrayProducts);
-  }
+function addToLocalStorage() {
+  let arrayProducts = JSON.stringify(cart);
+  localStorage.setItem("arrayProd", arrayProducts);
+}
 
 //Fonction d'écoute du clic sur le bouton "Ajouter au panier": stockage du produit dans le stockage local
 document.getElementById("addToCart").addEventListener("click", function () {
-  
-
-//Recuperation du tableau de produits present dans le localstorage
-function getCart() {
-  let arrayRecup = localStorage.getItem("arrayProd");
-  if (arrayRecup === null) {
-    return [];
+  //Recuperation du tableau de produits present dans le localstorage
+  function getCart() {
+    let arrayRecup = localStorage.getItem("arrayProd");
+    if (arrayRecup === null) {
+      return [];
+    }
+    return JSON.parse(arrayRecup);
   }
-  return JSON.parse(arrayRecup);
-}
 
-cart = getCart();
+  cart = getCart();
 
   //Si le localstorage est vide
   if (localStorage.length === null) {
-    console.log(localStorage.length);
     let cart = [];
     let objProduct = {
       id: idProduct,
@@ -60,8 +57,7 @@ cart = getCart();
     };
 
     cart.push(objProduct);
-
-    addToLocalStorage()
+    addToLocalStorage();
   }
 
   //Condition utilisant un indicateur pour la modification de la quantité d'un produit déjà existant ou l'ajout d'un nouveau produit
@@ -77,7 +73,14 @@ cart = getCart();
       ) {
         cart[i].quantity += parseInt(document.getElementById("quantity").value);
 
-        addToLocalStorage()
+        //Limite de 100 explemplaires imposée
+        if (cart[i].quantity > 100) {
+          cart[i].quantity = 100;
+          alert("Attention: Vous vous appretez à commander plus de 100 exemplaires de ce produit. Votre choix sera limité à 100 exemplaires"
+          );
+        }
+
+        addToLocalStorage();
 
         productFound = true;
       }
@@ -93,7 +96,7 @@ cart = getCart();
 
       cart.push(objProduct);
 
-      addToLocalStorage()
+      addToLocalStorage();
     }
   }
   console.log(cart);
