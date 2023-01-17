@@ -3,11 +3,11 @@
 //Récupération du tableau de produits pésent dans le localstorage
 function getCart() {
   let arrayRecup = localStorage.getItem("arrayProd");
-  
+
   if (arrayRecup === null) {
     return [];
   }
-  return JSON.parse(arrayRecup)
+  return JSON.parse(arrayRecup);
 }
 
 //Envoi du taleau produits dans le local storage
@@ -32,14 +32,12 @@ async function renderTotal() {
     });
 
     totalPrice += cart[i].quantity * product.price;
-    
   }
   document.getElementById("totalQuantity").innerHTML = totalQuantity;
   document.getElementById("totalPrice").innerHTML = totalPrice;
 }
 console.log(totalPrice);
 //--------------------------------------------------------------------------------------
-
 
 //Initialisation d'un tableau qui contiendra tout les id des produits dans le panier
 const arryaIdproducts = [];
@@ -48,7 +46,6 @@ const arryaIdproducts = [];
 cart = getCart();
 
 for (let i = 0; i < cart.length; i++) {
-  
   let idProduct = cart[i].id;
   let colorProduct = cart[i].color;
   let quantityProduct = cart[i].quantity;
@@ -130,9 +127,6 @@ for (let i = 0; i < cart.length; i++) {
       deleteItem.className = "deleteItem";
       deleteItem.innerText = "Supprimer";
 
-      
-      // renderTotal();
-
       //Balise du DOM ou se trouve les informations id et couleur produit, c'est aussi notre contenant produit
       const baliseArticle = divDelete.closest(":not(div)");
 
@@ -149,7 +143,7 @@ for (let i = 0; i < cart.length; i++) {
 
           addToLocalStorage();
         } else {
-          alert("Saississez une quantité de Kanap entre 1 et 100 éléments");
+          alert("Saississez une quantité de Kanap entre 1 et 100 produits");
         }
         renderTotal();
         console.log(cart);
@@ -185,8 +179,10 @@ renderTotal();
 //-------------------------------Validation du formulaire------------------------------
 
 //Variables contenants de regex
-const regexFirstName = /^([A-Za-záàâäãåçéèêëíìîïñóòôöõúùûüýÿæœÁÀÂÄÃÅÇÉÈÊËÍÌÎÏÑÓÒÔÖÕÚÙÛÜÝŸÆŒ]{2})?([-]{0,1})?([A-Za-z]{2,20})$/;
-const regexLastName = /^([A-Za-záàâäãåçéèêëíìîïñóòôöõúùûüýÿæœÁÀÂÄÃÅÇÉÈÊËÍÌÎÏÑÓÒÔÖÕÚÙÛÜÝŸÆŒ]{2})?([-]{0,1})?([A-Za-z]{2,20})$/;
+const regexFirstName =
+  /^([A-Za-záàâäãåçéèêëíìîïñóòôöõúùûüýÿæœÁÀÂÄÃÅÇÉÈÊËÍÌÎÏÑÓÒÔÖÕÚÙÛÜÝŸÆŒ]{2})?([-]{0,1})?([A-Za-z]{2,20})$/;
+const regexLastName =
+  /^([A-Za-záàâäãåçéèêëíìîïñóòôöõúùûüýÿæœÁÀÂÄÃÅÇÉÈÊËÍÌÎÏÑÓÒÔÖÕÚÙÛÜÝŸÆŒ]{2})?([-]{0,1})?([A-Za-z]{2,20})$/;
 const regexAddress = /^[a-zA-Z0-9\s,'-âä]{10,50}$/;
 const regexCity = /^([A-Za-z]{2})?([-]{0,1})?([A-Za-z]{2,20})$/;
 const regexEmail =
@@ -272,11 +268,11 @@ inputEmail.oninput = () => {
 };
 
 /**Au click du bouton on impose que tout les champs soient saisis correctements
-*Si la condition est remplie ,on peut envoyer notre objet attendu par l'API
-*/
-const buttunOrder = document.querySelector("#order");
-buttunOrder.onclick = () => {
-
+ *Si la condition est remplie ,on peut envoyer notre objet attendu par l'API
+ */
+const buttunOrder = document.getElementById("send");
+buttunOrder.addEventListener("submit", function (event) {
+  event.preventDefault();
   let firstName = inputFirstName.value;
   let lastName = inputLastName.value;
   let address = inputAddress.value;
@@ -290,10 +286,11 @@ buttunOrder.onclick = () => {
     regexLastName.test(lastName) &&
     regexCity.test(city) &&
     regexAddress.test(address) &&
-    regexEmail.test(email) === true
-    && cart.length != 0) {
+    regexEmail.test(email) === true &&
+    cart.length != 0
+  ) {
     //Si la condition est remplie ,on peut envoyer notre objet attendu par l'API
-    
+
     const order = {
       contact: {
         firstName: inputFirstName.value,
@@ -316,11 +313,12 @@ buttunOrder.onclick = () => {
         const idOfCommand = res;
         console.log(idOfCommand);
 
-        //On envoi l'id de l'url en page confirmation pour le recuperer
-        window.location.href = `confirmation.html?${idOfCommand.orderId}`;
-      });
+        localStorage.clear();
 
+        //On envoi l'id de l'url en page confirmation pour le recuperer...
+        window.location.href = `confirmation.html?id=${idOfCommand.orderId}`;
+      });
   } else {
     alert("Vérifiez votre saisie et faites votre choix de kanap");
   }
-};
+});

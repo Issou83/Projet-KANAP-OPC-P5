@@ -24,6 +24,8 @@ fetch("http://localhost:3000/api/products/" + idProduct)
 
       newsOptions.innerText = product.colors[i];
       optionColors.appendChild(newsOptions);
+
+      
     }
   });
 
@@ -34,8 +36,18 @@ function addToLocalStorage() {
   localStorage.setItem("arrayProd", arrayProducts);
 }
 
+//----------------------------------Ajout produit au panier------------------------------------
+
 //Fonction d'écoute du clic sur le bouton "Ajouter au panier": stockage du produit dans le stockage local
 document.getElementById("addToCart").addEventListener("click", function () {
+
+let choiceQuantity = parseInt(document.getElementById("quantity").value);
+let choiceColor = document.getElementById("colors").value;
+
+if (choiceColor === "" || choiceQuantity === 0) {
+alert("Veulliez choisir une couleur et une quantité minimum de 1 article")
+
+} else {
   //Recuperation du tableau de produits present dans le localstorage
   function getCart() {
     let arrayRecup = localStorage.getItem("arrayProd");
@@ -52,8 +64,8 @@ document.getElementById("addToCart").addEventListener("click", function () {
     let cart = [];
     let objProduct = {
       id: idProduct,
-      quantity: parseInt(document.getElementById("quantity").value),
-      color: document.getElementById("colors").value,
+      quantity: choiceQuantity,
+      color: choiceColor
     };
 
     cart.push(objProduct);
@@ -69,19 +81,16 @@ document.getElementById("addToCart").addEventListener("click", function () {
     for (i = 0; i < cart.length; i++) {
       if (
         cart[i].id == idProduct &&
-        cart[i].color == document.getElementById("colors").value
-      ) {
+        cart[i].color == document.getElementById("colors").value) {
+
         cart[i].quantity += parseInt(document.getElementById("quantity").value);
 
         //Limite de 100 explemplaires imposée
         if (cart[i].quantity > 100) {
           cart[i].quantity = 100;
-          alert("Attention: Vous vous appretez à commander plus de 100 exemplaires de ce produit. Votre choix sera limité à 100 exemplaires"
-          );
+          alert("Attention: Vous vous appretez à commander plus de 100 exemplaires de ce produit. Votre choix sera limité à 100 exemplaires");
         }
-
         addToLocalStorage();
-
         productFound = true;
       }
     }
@@ -93,11 +102,9 @@ document.getElementById("addToCart").addEventListener("click", function () {
         quantity: parseInt(document.getElementById("quantity").value),
         color: document.getElementById("colors").value,
       };
-
       cart.push(objProduct);
-
       addToLocalStorage();
     }
   }
-  console.log(cart);
-});
+}
+})
