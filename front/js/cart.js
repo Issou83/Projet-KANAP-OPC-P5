@@ -179,14 +179,11 @@ renderTotal();
 //-------------------------------Validation du formulaire------------------------------
 
 //Variables contenants de regex
-const regexFirstName =
-  /^([A-Za-záàâäãåçéèêëíìîïñóòôöõúùûüýÿæœÁÀÂÄÃÅÇÉÈÊËÍÌÎÏÑÓÒÔÖÕÚÙÛÜÝŸÆŒ]{2})?([-]{0,1})?([A-Za-z]{2,20})$/;
-const regexLastName =
-  /^([A-Za-záàâäãåçéèêëíìîïñóòôöõúùûüýÿæœÁÀÂÄÃÅÇÉÈÊËÍÌÎÏÑÓÒÔÖÕÚÙÛÜÝŸÆŒ]{2})?([-]{0,1})?([A-Za-z]{2,20})$/;
+const regexFirstName = /^[A-Z]+([a-z]{2,20})+(-[A-Z][a-z]+)?$/;
+const regexLastName = /^[A-Z][a-z]+(-[A-Z][a-z]+)?$/;
 const regexAddress = /^[a-zA-Z0-9\s,'-âä]{10,50}$/;
-const regexCity = /^([A-Za-z]{2})?([-]{0,1})?([A-Za-z]{2,20})$/;
-const regexEmail =
-  /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))/;
+const regexCity = /^[A-Z][a-z]+(-[A-Z][a-z]+)?$/;
+const regexEmail = /^[A-z0-9._-]+[@]{1}[a-zA-Z0-9._-]+[.]{1}[a-zA-Z]{2,10}/;
 
 //Creation de conditions de validation du formulaire pour chaques input
 const inputFirstName = document.querySelector("#firstName");
@@ -301,7 +298,6 @@ buttunOrder.addEventListener("submit", function (event) {
       },
       products: arryaIdproducts,
     };
-    console.log(typeof products);
 
     fetch("http://localhost:3000/api/products/order", {
       method: "POST",

@@ -1,6 +1,8 @@
 //Récupération de l'URL de la page courante pour en extraire l'identifiant du produit
 var str = window.location.href;
 var url = new URL(str);
+console.log(url);
+
 var idProduct = url.searchParams.get("id");
 
 /*Récupération et affichage de l'image et des informations (nom, description et prix)
@@ -24,8 +26,6 @@ fetch("http://localhost:3000/api/products/" + idProduct)
 
       newsOptions.innerText = product.colors[i];
       optionColors.appendChild(newsOptions);
-
-      
     }
   });
 
@@ -86,9 +86,9 @@ alert("Veulliez choisir une couleur et une quantité minimum de 1 article")
         cart[i].quantity += parseInt(document.getElementById("quantity").value);
 
         //Limite de 100 explemplaires imposée
-        if (cart[i].quantity > 100) {
-          cart[i].quantity = 100;
-          alert("Attention: Vous vous appretez à commander plus de 100 exemplaires de ce produit. Votre choix sera limité à 100 exemplaires");
+        if (cart[i].quantity > 100 || cart[i].quantity < 1) {
+          cart[i].quantity = 1;
+          alert("Attention: Vous avez saisie une quantité inapropriée");
         }
         addToLocalStorage();
         productFound = true;

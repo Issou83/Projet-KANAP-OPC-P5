@@ -1,8 +1,8 @@
 //On récupere l'id dans l'url de la page
-const Url = window.location.search
+var str = window.location.href;
+var url = new URL(str);
+var orderId = url.searchParams.get("id");
 
-//...cette id contient un "?" qu'il faut supprimer pour l'affichage 
-const orderId = Url.slice(1)
 document.getElementById("orderId").innerHTML = orderId
 
 
