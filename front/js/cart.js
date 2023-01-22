@@ -2,8 +2,8 @@
 
 //Trie des produits dans le tableau du localstorage par leur Id
 function sortCart() {
-  let arrayRecup = localStorage.getItem("arrayProd");
-  let cart = JSON.parse(arrayRecup);
+  let arrayInLocalStorage = localStorage.getItem("arrayProd");
+  let cart = JSON.parse(arrayInLocalStorage);
 
   let sortArray = cart.sort((a, b) => {
     if (a.id < b.id) {
@@ -23,11 +23,11 @@ function sortCart() {
 
 //Récupération du tableau de produits pésent dans le localstorage
 function getCart() {
-  let arrayRecup = localStorage.getItem("arrayProd");
-  if (arrayRecup === null) {
+  let arrayInLocalStorage = localStorage.getItem("arrayProd");
+  if (arrayInLocalStorage === null) {
     return [];
   }
-  let cart = JSON.parse(arrayRecup);
+  let cart = JSON.parse(arrayInLocalStorage);
 
   return cart;
 };

@@ -5,9 +5,11 @@ var idProduct = url.searchParams.get("id");
 
 /*Récupération et affichage de l'image et des informations (nom, description et prix)
  du produit choisi auprès de l'API, à l'aide de l'id du produit*/
-fetch("http://localhost:3000/api/products/" + idProduct)
-  .then((dataProduct) => dataProduct.json())
-  .then((product) => {
+ async function display() {
+  let product = await fetch("http://localhost:3000/api/products/" + idProduct)
+      .then((response) => {
+        return response.json();
+      });
     const imageContainer = document.querySelector("div.item__img");
     const imageProduct = document.createElement("img");
     imageContainer.appendChild(imageProduct);
@@ -25,7 +27,8 @@ fetch("http://localhost:3000/api/products/" + idProduct)
       newsOptions.innerText = product.colors[i];
       optionColors.appendChild(newsOptions);
     }
-  });
+  }
+  display()
 
 //Fonction d'envoi au localStorage
 
