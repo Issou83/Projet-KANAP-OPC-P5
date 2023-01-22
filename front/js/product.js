@@ -1,8 +1,6 @@
 //Récupération de l'URL de la page courante pour en extraire l'identifiant du produit
 var str = window.location.href;
 var url = new URL(str);
-console.log(url);
-
 var idProduct = url.searchParams.get("id");
 
 /*Récupération et affichage de l'image et des informations (nom, description et prix)
@@ -50,24 +48,23 @@ alert("Veulliez choisir une couleur et une quantité minimum de 1 article")
 } else {
   //Recuperation du tableau de produits present dans le localstorage
   function getCart() {
-    let arrayRecup = localStorage.getItem("arrayProd");
-    if (arrayRecup === null) {
+    let arrayToLocalStorage = localStorage.getItem("arrayProd");
+    if (arrayToLocalStorage === null) {
       return [];
     }
-    return JSON.parse(arrayRecup);
+    return JSON.parse(arrayToLocalStorage);
   }
 
   cart = getCart();
 
   //Si le localstorage est vide
-  if (localStorage.length === null) {
-    let cart = [];
+  if (cart.length === null) {
+   
     let objProduct = {
       id: idProduct,
       quantity: choiceQuantity,
       color: choiceColor
     };
-
     cart.push(objProduct);
     addToLocalStorage();
   }

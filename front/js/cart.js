@@ -1,20 +1,42 @@
 //--------------------------Fonctions réutilisables-----------------------------
 
+//Trie des produits dans le tableau du localstorage par leur Id
+function sortCart() {
+  let arrayRecup = localStorage.getItem("arrayProd");
+  let cart = JSON.parse(arrayRecup);
+
+  let sortArray = cart.sort((a, b) => {
+    if (a.id < b.id) {
+      return -1;
+    }
+    if (a.id > b.id) {
+      return 1;
+    }
+    if (a.id === b.id) {
+      return 0;
+    }
+  });
+
+  let arrayProducts = JSON.stringify(sortArray);
+  localStorage.setItem("arrayProd", arrayProducts);
+};
+
 //Récupération du tableau de produits pésent dans le localstorage
 function getCart() {
   let arrayRecup = localStorage.getItem("arrayProd");
-
   if (arrayRecup === null) {
     return [];
   }
-  return JSON.parse(arrayRecup);
-}
+  let cart = JSON.parse(arrayRecup);
+
+  return cart;
+};
 
 //Envoi du taleau produits dans le local storage
 function addToLocalStorage() {
   let arrayProducts = JSON.stringify(cart);
   localStorage.setItem("arrayProd", arrayProducts);
-}
+};
 
 //Calcul panier: total quantite et total prix
 async function renderTotal() {
@@ -25,9 +47,8 @@ async function renderTotal() {
   for (let i = 0; i < cart.length; i++) {
     totalQuantity += parseInt(cart[i].quantity);
 
-    let product = await fetch(
-      "http://localhost:3000/api/products/" + cart[i].id
-    ).then((response) => {
+    let product = await fetch("http://localhost:3000/api/products/" + cart[i].id)
+    .then((response) => {
       return response.json();
     });
 
@@ -35,144 +56,149 @@ async function renderTotal() {
   }
   document.getElementById("totalQuantity").innerHTML = totalQuantity;
   document.getElementById("totalPrice").innerHTML = totalPrice;
-}
-console.log(totalPrice);
-//--------------------------------------------------------------------------------------
+};
 
 //Initialisation d'un tableau qui contiendra tout les id des produits dans le panier
 const arryaIdproducts = [];
 
+//----------------------------------Affichage des produit dans la page--------------------------------------
+
 //---Création des cartes de produits, affichage du prix et quantite total dans le DOM-----
-cart = getCart();
+async function display() {
+  sortCart();
 
-for (let i = 0; i < cart.length; i++) {
-  let idProduct = cart[i].id;
-  let colorProduct = cart[i].color;
-  let quantityProduct = cart[i].quantity;
+  cart = getCart();
 
-  fetch("http://localhost:3000/api/products/" + idProduct)
-    .then((dataProduct) => dataProduct.json())
+  for (let i = 0; i < cart.length; i++) {
+    let idProduct = cart[i].id;
+    let colorProduct = cart[i].color;
+    let quantityProduct = cart[i].quantity;
 
-    .then((product) => {
-      //Création du container du produit
-      const sectionProduct = document.getElementById("cart__items");
-      const containerProduct = document.createElement("article");
-      sectionProduct.appendChild(containerProduct);
-      containerProduct.className = `cart__item`;
-      containerProduct.dataset.id = idProduct;
-      containerProduct.dataset.color = colorProduct;
-
-      //Création de la div de l'image et de la div du contenu de la carte
-      const divImage = document.createElement("div");
-      containerProduct.appendChild(divImage);
-      divImage.className = `cart__item__img`;
-
-      const image = document.createElement("img");
-      divImage.appendChild(image);
-      image.setAttribute("src", product.imageUrl);
-      image.setAttribute("alt", `Photographie d'un canapé`);
-
-      //Création de la div "contenue"
-      const divContent = document.createElement("div");
-      containerProduct.appendChild(divContent);
-      divContent.className = `cart__item__content`;
-
-      //Création de la div "déscription"
-      const divDescription = document.createElement("div");
-      divContent.appendChild(divDescription);
-      divDescription.className = `cart__item__content__description`;
-
-      const productName = document.createElement("h2");
-      divDescription.appendChild(productName);
-      productName.innerText = product.name;
-
-      const productColor = document.createElement("p");
-      divDescription.appendChild(productColor);
-      productColor.innerText = colorProduct;
-
-      let productPrice = document.createElement("p");
-      divDescription.appendChild(productPrice);
-      productPrice.innerText = product.price + " €";
-
-      //Création de la div "settings"
-      const divSettings = document.createElement("div");
-      divContent.appendChild(divSettings);
-      divSettings.className = `cart__item__content__settings`;
-
-      const divQuantity = document.createElement("div");
-      divSettings.appendChild(divQuantity);
-      divQuantity.className = `cart__item__content__settings__quantity`;
-
-      const productQuantity = document.createElement("p");
-      divQuantity.appendChild(productQuantity);
-      productQuantity.innerText = "Qte : ";
-
-      const inputNumber = document.createElement("input");
-      divQuantity.appendChild(inputNumber);
-
-      inputNumber.className = "itemQuantity";
-      inputNumber.setAttribute("type", "number");
-      inputNumber.setAttribute("name", "itemQuantity");
-      inputNumber.setAttribute("min", 1);
-      inputNumber.setAttribute("max", 100);
-      inputNumber.setAttribute("value", quantityProduct);
-
-      //Création du "bouton" supprimer
-      const divDelete = document.createElement("div");
-      divSettings.appendChild(divDelete);
-      divDelete.className = `cart__item__content__settings__delete`;
-
-      const deleteItem = document.createElement("p");
-      divDelete.appendChild(deleteItem);
-      deleteItem.className = "deleteItem";
-      deleteItem.innerText = "Supprimer";
-
-      //Balise du DOM ou se trouve les informations id et couleur produit, c'est aussi notre contenant produit
-      const baliseArticle = divDelete.closest(":not(div)");
-
-      //----------------------------Modification de la quantité produit------------------------
-      inputNumber.onchange = () => {
-        if (inputNumber.value <= 100 && inputNumber.value > 0) {
-          cart = getCart();
-          const productCurrentQuantity = cart.find(
-            (o) =>
-              o.id === baliseArticle.dataset.id &&
-              o.color === baliseArticle.dataset.color
-          );
-          productCurrentQuantity.quantity = parseInt(inputNumber.value);
-
-          addToLocalStorage();
-        } else {
-          alert("Saississez une quantité de Kanap entre 1 et 100 produits");
-        }
-        renderTotal();
-        console.log(cart);
-      };
-
-      //------------------------------------Suppression produit----------------------------------
-      divDelete.onclick = () => {
-        cart = getCart();
-        const productfound = cart.find(
-          (h) =>
-            h.id === baliseArticle.dataset.id &&
-            h.color === baliseArticle.dataset.color
-        );
-
-        const index = cart.indexOf(productfound);
-        cart.splice(index, 1);
-
-        const productDelete = baliseArticle.closest(":not(div)");
-        productDelete.remove();
-
-        addToLocalStorage();
-        renderTotal();
-      };
+    let product = await fetch("http://localhost:3000/api/products/" + idProduct)
+    .then((response) => {
+      return response.json();
     });
 
-  /*Injection des id produits stockés dans notre localstorage
-  (anticipé pour la commande)*/
-  arryaIdproducts.push(idProduct);
-}
+    //Création du container du produit
+    const sectionProduct = document.getElementById("cart__items");
+    const containerProduct = document.createElement("article");
+    sectionProduct.appendChild(containerProduct);
+    containerProduct.className = `cart__item`;
+    containerProduct.dataset.id = idProduct;
+    containerProduct.dataset.color = colorProduct;
+
+    //Création de la div de l'image et de la div du contenu de la carte
+    const divImage = document.createElement("div");
+    containerProduct.appendChild(divImage);
+    divImage.className = `cart__item__img`;
+
+    const image = document.createElement("img");
+    divImage.appendChild(image);
+    image.setAttribute("src", product.imageUrl);
+    image.setAttribute("alt", `Photographie d'un canapé`);
+
+    //Création de la div "contenue"
+    const divContent = document.createElement("div");
+    containerProduct.appendChild(divContent);
+    divContent.className = `cart__item__content`;
+
+    //Création de la div "déscription"
+    const divDescription = document.createElement("div");
+    divContent.appendChild(divDescription);
+    divDescription.className = `cart__item__content__description`;
+
+    const productName = document.createElement("h2");
+    divDescription.appendChild(productName);
+    productName.innerText = product.name;
+
+    const productColor = document.createElement("p");
+    divDescription.appendChild(productColor);
+    productColor.innerText = colorProduct;
+
+    let productPrice = document.createElement("p");
+    divDescription.appendChild(productPrice);
+    productPrice.innerText = product.price + " €";
+
+    //Création de la div "settings"
+    const divSettings = document.createElement("div");
+    divContent.appendChild(divSettings);
+    divSettings.className = `cart__item__content__settings`;
+
+    const divQuantity = document.createElement("div");
+    divSettings.appendChild(divQuantity);
+    divQuantity.className = `cart__item__content__settings__quantity`;
+
+    const productQuantity = document.createElement("p");
+    divQuantity.appendChild(productQuantity);
+    productQuantity.innerText = "Qte : ";
+
+    const inputNumber = document.createElement("input");
+    divQuantity.appendChild(inputNumber);
+
+    inputNumber.className = "itemQuantity";
+    inputNumber.setAttribute("type", "number");
+    inputNumber.setAttribute("name", "itemQuantity");
+    inputNumber.setAttribute("min", 1);
+    inputNumber.setAttribute("max", 100);
+    inputNumber.setAttribute("value", quantityProduct);
+
+    //Création du "bouton" supprimer
+    const divDelete = document.createElement("div");
+    divSettings.appendChild(divDelete);
+    divDelete.className = `cart__item__content__settings__delete`;
+
+    const deleteItem = document.createElement("p");
+    divDelete.appendChild(deleteItem);
+    deleteItem.className = "deleteItem";
+    deleteItem.innerText = "Supprimer";
+
+    //Balise du DOM ou se trouve les informations id et couleur produit, c'est aussi notre contenant produit
+    const baliseArticle = divDelete.closest(":not(div)");
+
+    //----------------------------Modification de la quantité produit------------------------
+    inputNumber.onchange = () => {
+      if (inputNumber.value <= 100 && inputNumber.value > 0) {
+        cart = getCart();
+        const productCurrentQuantity = cart.find(
+          (o) =>
+            o.id === baliseArticle.dataset.id &&
+            o.color === baliseArticle.dataset.color
+        );
+        productCurrentQuantity.quantity = parseInt(inputNumber.value);
+
+        addToLocalStorage();
+
+      } else {
+        alert("Saississez une quantité de Kanap entre 1 et 100 produits");
+      }
+      renderTotal();
+    };
+
+    //------------------------------------Suppression produit----------------------------------
+    divDelete.onclick = () => {
+      cart = getCart();
+      const productfound = cart.find(
+        (h) =>
+          h.id === baliseArticle.dataset.id &&
+          h.color === baliseArticle.dataset.color
+      );
+
+      const index = cart.indexOf(productfound);
+      cart.splice(index, 1);
+
+      
+      baliseArticle.remove();
+
+      addToLocalStorage();
+      renderTotal();
+    };
+
+    /*Injection des id produits stockés dans notre localstorage, dans un tableau
+    (anticipé pour la commande)*/
+    arryaIdproducts.push(idProduct);
+  }
+};
+display();
 
 //Affichage initial du total quantité et prix
 renderTotal();
@@ -215,7 +241,6 @@ inputLastName.oninput = () => {
     inputLastName.style.border = "1px solid red";
   }
 };
-
 //------------------------------
 const inputAddress = document.querySelector("#address");
 
@@ -232,7 +257,6 @@ inputAddress.oninput = () => {
   }
 };
 //-------------------------------
-
 const inputCity = document.querySelector("#city");
 
 inputCity.oninput = () => {
@@ -248,7 +272,6 @@ inputCity.oninput = () => {
   }
 };
 //--------------------------------
-
 const inputEmail = document.querySelector("#email");
 
 inputEmail.oninput = () => {
@@ -265,10 +288,11 @@ inputEmail.oninput = () => {
 };
 
 /**Au click du bouton on impose que tout les champs soient saisis correctements
- *Si la condition est remplie ,on peut envoyer notre objet attendu par l'API
+ *Si la condition est remplie ,on peut envoyer nos données à l'API
  */
-const buttunOrder = document.getElementById("send");
-buttunOrder.addEventListener("submit", function (event) {
+const buttonOrder = document.getElementById("send");
+
+buttonOrder.addEventListener("submit", function (event) {
   event.preventDefault();
   let firstName = inputFirstName.value;
   let lastName = inputLastName.value;
@@ -276,8 +300,6 @@ buttunOrder.addEventListener("submit", function (event) {
   let city = inputCity.value;
   let email = inputEmail.value;
 
-  //Contrôler l'envoi car impossible si la balise "type" est renseigné avec "submit"*******************************************
-  //******************************************************************************************************************************
   if (
     regexFirstName.test(firstName) &&
     regexLastName.test(lastName) &&
@@ -286,8 +308,6 @@ buttunOrder.addEventListener("submit", function (event) {
     regexEmail.test(email) === true &&
     cart.length != 0
   ) {
-    //Si la condition est remplie ,on peut envoyer notre objet attendu par l'API
-
     const order = {
       contact: {
         firstName: inputFirstName.value,
@@ -307,13 +327,13 @@ buttunOrder.addEventListener("submit", function (event) {
       .then((response) => response.json())
       .then((res) => {
         const idOfCommand = res;
-        console.log(idOfCommand);
 
         localStorage.clear();
 
         //On envoi l'id de l'url en page confirmation pour le recuperer...
         window.location.href = `confirmation.html?id=${idOfCommand.orderId}`;
-      });
+      })
+
   } else {
     alert("Vérifiez votre saisie et faites votre choix de kanap");
   }

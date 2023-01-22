@@ -1,7 +1,11 @@
 //Récupération des données des produits et leur affichage sur la page
-fetch("http://localhost:3000/api/products")
-  .then((data) => data.json())
-  .then((products) => {
+
+async function display() {
+  
+  let products = await fetch("http://localhost:3000/api/products/")
+  .then((response) => {
+    return response.json();
+  });
 
     for (let product of products) {
 
@@ -29,4 +33,5 @@ fetch("http://localhost:3000/api/products")
       description.innerText = product.description;
 
     }
-  });
+}
+display()
