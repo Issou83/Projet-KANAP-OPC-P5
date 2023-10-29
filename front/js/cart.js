@@ -1,26 +1,5 @@
 //--------------------------Fonctions réutilisables-----------------------------
 
-//Trie des produits dans le tableau du localstorage par leur Id
-function sortCart() {
-  let arrayInLocalStorage = localStorage.getItem("arrayProd");
-  let cart = JSON.parse(arrayInLocalStorage);
-
-  let sortArray = cart.sort((a, b) => {
-    if (a.id < b.id) {
-      return -1;
-    }
-    if (a.id > b.id) {
-      return 1;
-    }
-    if (a.id === b.id) {
-      return 0;
-    }
-  });
-
-  let arrayProducts = JSON.stringify(sortArray);
-  localStorage.setItem("arrayProd", arrayProducts);
-};
-
 //Récupération du tableau de produits pésent dans le localstorage
 function getCart() {
   let arrayInLocalStorage = localStorage.getItem("arrayProd");
@@ -30,13 +9,13 @@ function getCart() {
   let cart = JSON.parse(arrayInLocalStorage);
 
   return cart;
-};
+}
 
 //Envoi du taleau produits dans le local storage
 function addToLocalStorage() {
   let arrayProducts = JSON.stringify(cart);
   localStorage.setItem("arrayProd", arrayProducts);
-};
+}
 
 //Calcul panier: total quantite et total prix
 async function renderTotal() {
@@ -47,8 +26,9 @@ async function renderTotal() {
   for (let i = 0; i < cart.length; i++) {
     totalQuantity += parseInt(cart[i].quantity);
 
-    let product = await fetch("http://localhost:3000/api/products/" + cart[i].id)
-    .then((response) => {
+    let product = await fetch(
+      "http://localhost:3000/api/products/" + cart[i].id
+    ).then((response) => {
       return response.json();
     });
 
@@ -56,7 +36,7 @@ async function renderTotal() {
   }
   document.getElementById("totalQuantity").innerHTML = totalQuantity;
   document.getElementById("totalPrice").innerHTML = totalPrice;
-};
+}
 
 //Initialisation d'un tableau qui contiendra tout les id des produits dans le panier
 const arryaIdproducts = [];
@@ -65,8 +45,6 @@ const arryaIdproducts = [];
 
 //---Création des cartes de produits, affichage du prix et quantite total dans le DOM-----
 async function display() {
-  sortCart();
-
   cart = getCart();
 
   for (let i = 0; i < cart.length; i++) {
@@ -74,8 +52,9 @@ async function display() {
     let colorProduct = cart[i].color;
     let quantityProduct = cart[i].quantity;
 
-    let product = await fetch("http://localhost:3000/api/products/" + idProduct)
-    .then((response) => {
+    let product = await fetch(
+      "http://localhost:3000/api/products/" + idProduct
+    ).then((response) => {
       return response.json();
     });
 
@@ -167,7 +146,6 @@ async function display() {
         productCurrentQuantity.quantity = parseInt(inputNumber.value);
 
         addToLocalStorage();
-
       } else {
         alert("Saississez une quantité de Kanap entre 1 et 100 produits");
       }
@@ -186,7 +164,6 @@ async function display() {
       const index = cart.indexOf(productfound);
       cart.splice(index, 1);
 
-      
       baliseArticle.remove();
 
       addToLocalStorage();
@@ -197,7 +174,7 @@ async function display() {
     (anticipé pour la commande)*/
     arryaIdproducts.push(idProduct);
   }
-};
+}
 display();
 
 //Affichage initial du total quantité et prix
@@ -332,8 +309,7 @@ buttonOrder.addEventListener("submit", function (event) {
 
         //On envoi l'id de l'url en page confirmation pour le recuperer...
         window.location.href = `confirmation.html?id=${idOfCommand.orderId}`;
-      })
-
+      });
   } else {
     alert("Vérifiez votre saisie et faites votre choix de kanap");
   }
